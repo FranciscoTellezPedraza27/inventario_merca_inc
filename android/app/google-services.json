@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "653345431959",
+    "project_id": "inventario-merca-inc",
+    "storage_bucket": "inventario-merca-inc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:653345431959:android:eb9776904125f8883864d2",
+        "android_client_info": {
+          "package_name": "com.example.inventario_merca_inc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4xT-p_38qMVOdLkQk-Kvps3VyvhQPGVI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
