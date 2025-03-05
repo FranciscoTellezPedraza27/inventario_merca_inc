@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class AddOrderScreen extends StatefulWidget {
-  const AddOrderScreen({super.key});
+class AddPapeleriaScreen extends StatefulWidget {
+  const AddPapeleriaScreen({super.key});
 
   @override
-  _AddOrderScreenState createState() => _AddOrderScreenState();
+  _AddPapeleriaScreenState createState() => _AddPapeleriaScreenState();
 }
 
-class _AddOrderScreenState extends State<AddOrderScreen> {
+class _AddPapeleriaScreenState extends State<AddPapeleriaScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _codigoProd = TextEditingController();
   final TextEditingController _nombreController = TextEditingController();
@@ -17,7 +17,7 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   final TextEditingController _existenciaMinimaController = TextEditingController();
   final TextEditingController _precioController = TextEditingController();
 
-  Future<void> _addOrder() async {
+  Future<void> _addPapeleria() async {
     if (_formKey.currentState!.validate()) {
       try {
         await FirebaseFirestore.instance.collection('pedidos').add({
@@ -73,7 +73,7 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
                   child: const Text('Cancelar'),
                 ),
                 ElevatedButton(
-                  onPressed: _addOrder,
+                  onPressed: _addPapeleria,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,

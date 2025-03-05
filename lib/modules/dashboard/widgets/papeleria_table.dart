@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class InventoryTable extends StatefulWidget {
-  const InventoryTable({Key? key}) : super(key: key);
+class PapeleriaTable extends StatefulWidget {
+  const PapeleriaTable({Key? key}) : super(key: key);
 
   @override
-  InventoryTableState createState() => InventoryTableState();
+  PapeleriaTableState createState() => PapeleriaTableState();
 }
 
-class InventoryTableState extends State<InventoryTable> {
+class PapeleriaTableState extends State<PapeleriaTable> {
   String _searchQuery = "";
   final ScrollController _scrollController = ScrollController(); // Controlador para el scroll
 
@@ -31,7 +31,7 @@ class InventoryTableState extends State<InventoryTable> {
           ],
         ),
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('electronicos').snapshots(),
+          stream: FirebaseFirestore.instance.collection('papeleria').snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -95,7 +95,7 @@ class InventoryTableState extends State<InventoryTable> {
                         DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Antigüedad", textAlign: TextAlign.center)))),
                         DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Valor aproximado", textAlign: TextAlign.center)))),
                         DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Responsable", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Responsabilidad", textAlign: TextAlign.center)))),
+                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Recibo / Instructivo", textAlign: TextAlign.center)))),
                         DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Ubicación", textAlign: TextAlign.center)))),
                       ],
                       rows: filteredData.map((document) {

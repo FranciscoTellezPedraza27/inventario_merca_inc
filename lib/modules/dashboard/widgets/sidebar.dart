@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:remixicon/remixicon.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
@@ -53,11 +54,18 @@ Widget build(BuildContext context) {
             ),
           ),
           const SizedBox(height: 20),
-          _sidebarItem(context, Feather.home, "Inicio", '/dashboard'),
-          _sidebarItem(context, Feather.package, "Electrónicos", '/electronic'),
-          _sidebarItem(context, Feather.truck, "Pedidos", '/orders'),
-          _sidebarItem(context, Feather.bar_chart_2, "Historial", '/pending'),
-          _sidebarItem(context, Feather.user, "Usuarios", '/users'),
+          _sidebarItem(context, Remix.home_2_line, "Inicio", '/dashboard'),
+          _sidebarItem(context, Remix.tv_line, "Electrónicos", '/electronic'),
+          _sidebarItem(context, Remix.draft_line, "Papelería", '/papeleria'),
+          _sidebarItem(context, Remix.printer_line, "Sublimación", '/pending'),
+          _sidebarItem(context, Remix.armchair_line, "Mobiliario", '/users'),
+          _sidebarItem(context, Remix.cup_line, "Cocina", '/cocina'),
+          _sidebarItem(context, Remix.brush_4_line, "Limpieza", '/limpieza'),
+          _sidebarItem(context, Remix.hammer_line, "Herramientas", '/herramientas'),
+          _sidebarItem(context, Remix.clapperboard_line, "Porducción", '/produccion'),
+          _sidebarItem(context, Remix.box_3_line, "Otros", '/otros'),
+          _sidebarItem(context, Remix.bear_smile_line, "Oxxo Kids", '/oxxo_k'),
+          _sidebarItem(context, Remix.user_3_line, "Oxxo Adultos Mayores", '/oxxo_a'),
           Spacer(),
           _sidebarItem(context, Icons.exit_to_app, "Cerrar Sesión", '', isLogout: true),
         ],

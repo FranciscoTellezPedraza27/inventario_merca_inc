@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../modules/auth/views/login_page.dart';
 import '../modules/dashboard/views/dashboard_screen.dart';
 import '../modules/dashboard/views/electronics_screen.dart';
-import '../modules/dashboard/views/orders_screen.dart';
+import '../modules/dashboard/views/papeleria_screen.dart';
 import '../modules/dashboard/views/record_screen.dart';
 
 final Map<String, WidgetBuilder> appRoutes = {
@@ -13,8 +13,8 @@ final Map<String, WidgetBuilder> appRoutes = {
 class AppRoutes {
   static const String login = '/login';
   static const String dashboard = '/dashboard';
-  static const String inventory = '/electronic';
-  static const String orders = '/orders';
+  static const String electronica = '/electronic';
+  static const String papeleria = '/papeleria';
   static const String pending = '/record';
   static const String users = '/users';
 
@@ -24,10 +24,10 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => LoginScreen());
       case dashboard:
         return MaterialPageRoute(builder: (_) => DashboardScreen());
-      case inventory:
+      case electronica:
         return MaterialPageRoute(builder: (_) => ElectronicsScreen());
-      case orders:
-        return MaterialPageRoute(builder: (_) => OrdersView());
+      case papeleria:
+        return MaterialPageRoute(builder: (_) => PapeleriaView());
       case pending:
         return MaterialPageRoute(builder: (_) => RecordView());
       default:
