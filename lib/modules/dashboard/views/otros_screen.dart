@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:inventario_merca_inc/modules/dashboard/views/add_papeleria_screen.dart';
-import 'package:inventario_merca_inc/modules/dashboard/widgets/papeleria_table.dart';
+import 'package:inventario_merca_inc/modules/dashboard/views/add_otros_screen.dart';
+import 'package:inventario_merca_inc/modules/dashboard/widgets/otros_table.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/top_bar.dart';
 
-class PapeleriaScreen extends StatefulWidget {
-  const PapeleriaScreen({Key? key}) : super(key: key);
+class OtrosScreen extends StatefulWidget {
+  const OtrosScreen({Key? key}) : super(key: key);
 
   @override
-  _PapeleriaScreenState createState() => _PapeleriaScreenState();
+  _OtrosScreenState createState() => _OtrosScreenState();
 }
 
-class _PapeleriaScreenState extends State<PapeleriaScreen> {
-  final GlobalKey<PapeleriaTableState> _papeleriaTableKey = GlobalKey<PapeleriaTableState>();
+class _OtrosScreenState extends State<OtrosScreen> {
+  final GlobalKey<OtrosTableState> _otrosTableKey = GlobalKey<OtrosTableState>();
 
  void _navigateToAddProduct(BuildContext context) {
     showDialog(
@@ -24,7 +24,7 @@ class _PapeleriaScreenState extends State<PapeleriaScreen> {
         insetPadding: const EdgeInsets.symmetric(horizontal: 20),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500),
-          child: const AddPapeleriaScreen(),
+          child: const AddOtrosScreen(),
         ),
       ),
     );
@@ -47,13 +47,13 @@ class _PapeleriaScreenState extends State<PapeleriaScreen> {
           TopBar(title: "Papelería"),
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
-            onSearch: (query) => _papeleriaTableKey.currentState?.updateSearchQuery(query),
+            onSearch: (query) => _otrosTableKey.currentState?.updateSearchQuery(query),
           ),
           const SizedBox(height: 10),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: PapeleriaTable(key: _papeleriaTableKey),
+              child: OtrosTable(key: _otrosTableKey),
             ),
           ),
         ],

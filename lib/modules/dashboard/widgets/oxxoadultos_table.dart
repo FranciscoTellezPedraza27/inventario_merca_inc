@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PapeleriaTable extends StatefulWidget {
-  const PapeleriaTable({Key? key}) : super(key: key);
+class OxxoAdultosTable extends StatefulWidget {
+  const OxxoAdultosTable({Key? key}) : super(key: key);
 
   @override
-  PapeleriaTableState createState() => PapeleriaTableState();
+  OxxoAdultosTableState createState() => OxxoAdultosTableState();
 }
 
-class PapeleriaTableState extends State<PapeleriaTable> {
+class OxxoAdultosTableState extends State<OxxoAdultosTable> {
   String _searchQuery = "";
   final ScrollController _scrollController = ScrollController(); // Controlador para el scroll
 
@@ -20,11 +20,11 @@ class PapeleriaTableState extends State<PapeleriaTable> {
   //Función para actualizar los docuemntos
   void actualizarTimeStamp() async {
     var instance = FirebaseFirestore.instance;
-    var docs = await instance.collection('papeleria').get();
+    var docs = await instance.collection('oxxoadultos').get();
     
     for (var doc in docs.docs) {
       if (!doc.data().containsKey('timestamp')) {
-        await instance.collection('papeleria').doc(doc.id).update({
+        await instance.collection('oxxoadultos').doc(doc.id).update({
           'timestamp': FieldValue.serverTimestamp(),
         });
       }
@@ -51,7 +51,7 @@ class PapeleriaTableState extends State<PapeleriaTable> {
         ),
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
-          .collection('papeleria')
+          .collection('oxxoadultos')
           .orderBy('timestamp', descending: false)
           .snapshots(),
           builder: (context, snapshot) {

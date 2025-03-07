@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:inventario_merca_inc/modules/dashboard/views/add_papeleria_screen.dart';
-import 'package:inventario_merca_inc/modules/dashboard/widgets/papeleria_table.dart';
-import '../widgets/sidebar.dart';
-import '../widgets/search_bar.dart';
+import 'package:inventario_merca_inc/modules/dashboard/views/add_sublimacion_screen.dart';
+import 'package:inventario_merca_inc/modules/dashboard/widgets/search_bar.dart';
+import 'package:inventario_merca_inc/modules/dashboard/widgets/sidebar.dart';
+import 'package:inventario_merca_inc/modules/dashboard/widgets/sublimacion_table.dart';
 import '../widgets/top_bar.dart';
 
-class PapeleriaScreen extends StatefulWidget {
-  const PapeleriaScreen({Key? key}) : super(key: key);
 
+class SublimacionScreen extends StatefulWidget {
   @override
-  _PapeleriaScreenState createState() => _PapeleriaScreenState();
+  _SublimacionScreenState createState() => _SublimacionScreenState();
 }
 
-class _PapeleriaScreenState extends State<PapeleriaScreen> {
-  final GlobalKey<PapeleriaTableState> _papeleriaTableKey = GlobalKey<PapeleriaTableState>();
+class _SublimacionScreenState extends State<SublimacionScreen> {
+  final GlobalKey<SublimacionTableState> _sbulimacionTableKey = GlobalKey<SublimacionTableState>();
 
- void _navigateToAddProduct(BuildContext context) {
+  void _navigateToAddProduct(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -24,7 +23,7 @@ class _PapeleriaScreenState extends State<PapeleriaScreen> {
         insetPadding: const EdgeInsets.symmetric(horizontal: 20),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500),
-          child: const AddPapeleriaScreen(),
+          child: const AddSublimacionScreen(),
         ),
       ),
     );
@@ -44,16 +43,16 @@ class _PapeleriaScreenState extends State<PapeleriaScreen> {
       drawer: const Sidebar(),
       body: Column(
         children: [
-          TopBar(title: "Papelería"),
+          TopBar(title: "Sublimación"),
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
-            onSearch: (query) => _papeleriaTableKey.currentState?.updateSearchQuery(query),
+            onSearch: (query) => _sbulimacionTableKey.currentState?.updateSearchQuery(query),
           ),
           const SizedBox(height: 10),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: PapeleriaTable(key: _papeleriaTableKey),
+              child: SublimacionTable(key: _sbulimacionTableKey),
             ),
           ),
         ],

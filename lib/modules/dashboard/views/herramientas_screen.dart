@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:inventario_merca_inc/modules/dashboard/views/add_papeleria_screen.dart';
-import 'package:inventario_merca_inc/modules/dashboard/widgets/papeleria_table.dart';
+import 'package:inventario_merca_inc/modules/dashboard/views/add_herramientas_screen.dart';
+import 'package:inventario_merca_inc/modules/dashboard/widgets/herramientas_table.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/top_bar.dart';
 
-class PapeleriaScreen extends StatefulWidget {
-  const PapeleriaScreen({Key? key}) : super(key: key);
+class HerramientasScreen extends StatefulWidget {
+  const HerramientasScreen({Key? key}) : super(key: key);
 
   @override
-  _PapeleriaScreenState createState() => _PapeleriaScreenState();
+  _HerramientasScreenState createState() => _HerramientasScreenState();
 }
 
-class _PapeleriaScreenState extends State<PapeleriaScreen> {
-  final GlobalKey<PapeleriaTableState> _papeleriaTableKey = GlobalKey<PapeleriaTableState>();
+class _HerramientasScreenState extends State<HerramientasScreen> {
+  final GlobalKey<HerramientasTableState> _herramientasTableKey = GlobalKey<HerramientasTableState>();
 
  void _navigateToAddProduct(BuildContext context) {
     showDialog(
@@ -24,7 +24,7 @@ class _PapeleriaScreenState extends State<PapeleriaScreen> {
         insetPadding: const EdgeInsets.symmetric(horizontal: 20),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500),
-          child: const AddPapeleriaScreen(),
+          child: const AddHerramientasScreen(),
         ),
       ),
     );
@@ -44,16 +44,16 @@ class _PapeleriaScreenState extends State<PapeleriaScreen> {
       drawer: const Sidebar(),
       body: Column(
         children: [
-          TopBar(title: "Papelería"),
+          TopBar(title: "Herramientas"),
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
-            onSearch: (query) => _papeleriaTableKey.currentState?.updateSearchQuery(query),
+            onSearch: (query) => _herramientasTableKey.currentState?.updateSearchQuery(query),
           ),
           const SizedBox(height: 10),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: PapeleriaTable(key: _papeleriaTableKey),
+              child: HerramientasTable(key: _herramientasTableKey),
             ),
           ),
         ],

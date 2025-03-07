@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:inventario_merca_inc/modules/dashboard/views/add_papeleria_screen.dart';
-import 'package:inventario_merca_inc/modules/dashboard/widgets/papeleria_table.dart';
+import 'package:inventario_merca_inc/modules/dashboard/views/add_oxxoadultos_screen.dart';
+import 'package:inventario_merca_inc/modules/dashboard/widgets/oxxoadultos_table.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/top_bar.dart';
 
-class PapeleriaScreen extends StatefulWidget {
-  const PapeleriaScreen({Key? key}) : super(key: key);
+class OxxoAdultosScreen extends StatefulWidget {
+  const OxxoAdultosScreen({Key? key}) : super(key: key);
 
   @override
-  _PapeleriaScreenState createState() => _PapeleriaScreenState();
+  _OxxoAdultosScreenState createState() => _OxxoAdultosScreenState();
 }
 
-class _PapeleriaScreenState extends State<PapeleriaScreen> {
-  final GlobalKey<PapeleriaTableState> _papeleriaTableKey = GlobalKey<PapeleriaTableState>();
+class _OxxoAdultosScreenState extends State<OxxoAdultosScreen> {
+  final GlobalKey<OxxoAdultosTableState> _oxxoAdultosTableKey = GlobalKey<OxxoAdultosTableState>();
 
  void _navigateToAddProduct(BuildContext context) {
     showDialog(
@@ -24,7 +24,7 @@ class _PapeleriaScreenState extends State<PapeleriaScreen> {
         insetPadding: const EdgeInsets.symmetric(horizontal: 20),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500),
-          child: const AddPapeleriaScreen(),
+          child: const AddOxxoAdultosScreen(),
         ),
       ),
     );
@@ -47,13 +47,13 @@ class _PapeleriaScreenState extends State<PapeleriaScreen> {
           TopBar(title: "Papelería"),
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
-            onSearch: (query) => _papeleriaTableKey.currentState?.updateSearchQuery(query),
+            onSearch: (query) => _oxxoAdultosTableKey.currentState?.updateSearchQuery(query),
           ),
           const SizedBox(height: 10),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: PapeleriaTable(key: _papeleriaTableKey),
+              child: OxxoAdultosTable(key: _oxxoAdultosTableKey),
             ),
           ),
         ],

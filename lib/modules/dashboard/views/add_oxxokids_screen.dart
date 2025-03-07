@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AddPapeleriaScreen extends StatefulWidget {
-  const AddPapeleriaScreen({super.key});
+class AddOxxoKidsScreen extends StatefulWidget {
+  const AddOxxoKidsScreen({super.key});
 
   @override
-  _AddPapeleriaScreenState createState() => _AddPapeleriaScreenState();
+  _AddOxxoKidsScreenState createState() => _AddOxxoKidsScreenState();
 }
 
-class _AddPapeleriaScreenState extends State<AddPapeleriaScreen> {
+class _AddOxxoKidsScreenState extends State<AddOxxoKidsScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _cantidad = TextEditingController();
   final TextEditingController _articuloController = TextEditingController();
@@ -26,7 +26,7 @@ class _AddPapeleriaScreenState extends State<AddPapeleriaScreen> {
   Future<void> _addElectronic() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await FirebaseFirestore.instance.collection('papeleria').doc().set({
+        await FirebaseFirestore.instance.collection('oxxokids').doc().set({
           'cantidad': _cantidad.text,
           'articulo': _articuloController.text,
           'marca': _marcaController.text,

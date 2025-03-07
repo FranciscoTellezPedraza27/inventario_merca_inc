@@ -1,30 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PapeleriaTable extends StatefulWidget {
-  const PapeleriaTable({Key? key}) : super(key: key);
+class SublimacionTable extends StatefulWidget {
+  const SublimacionTable({Key? key}) : super(key: key);
 
   @override
-  PapeleriaTableState createState() => PapeleriaTableState();
+  SublimacionTableState createState() => SublimacionTableState();
 }
 
-class PapeleriaTableState extends State<PapeleriaTable> {
+class SublimacionTableState extends State<SublimacionTable> {
   String _searchQuery = "";
   final ScrollController _scrollController = ScrollController(); // Controlador para el scroll
 
-  void initstate() {
+  @override
+  void initState() {
     super.initState();
-    actualizarTimeStamp();
+    actualizarTimestamp(); // Ejecutar la función al iniciar
   }
 
-  //Función para actualizar los docuemntos
-  void actualizarTimeStamp() async {
+  // Función para actualizar los documentos antiguos sin timestamp
+  void actualizarTimestamp() async {
     var instance = FirebaseFirestore.instance;
-    var docs = await instance.collection('papeleria').get();
-    
+    var docs = await instance.collection('sublimacion').get();
+
     for (var doc in docs.docs) {
       if (!doc.data().containsKey('timestamp')) {
-        await instance.collection('papeleria').doc(doc.id).update({
+        await instance.collection('sublimacion').doc(doc.id).update({
           'timestamp': FieldValue.serverTimestamp(),
         });
       }
@@ -37,7 +38,7 @@ class PapeleriaTableState extends State<PapeleriaTable> {
     });
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
@@ -51,7 +52,7 @@ class PapeleriaTableState extends State<PapeleriaTable> {
         ),
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
-          .collection('papeleria')
+          .collection('sublimacion')
           .orderBy('timestamp', descending: false)
           .snapshots(),
           builder: (context, snapshot) {

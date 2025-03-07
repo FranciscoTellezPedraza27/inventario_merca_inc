@@ -53,7 +53,7 @@ class ElectronicTableState extends State<ElectronicTable> {
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('electronicos')
-              .orderBy('timestamp', descending: true) // Ahora se puede ordenar por timestamp
+              .orderBy('timestamp', descending: false) // Ahora se puede ordenar por timestamp
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -79,10 +79,26 @@ class ElectronicTableState extends State<ElectronicTable> {
               return nombre.contains(_searchQuery) || codigo.contains(_searchQuery);
             }).toList();
 
-            return Scrollbar(
-              controller: _scrollController,
-              thumbVisibility: true,
-              child: SingleChildScrollView(
+            return ScrollbarTheme(
+              data: ScrollbarThemeData(
+                thumbColor: MaterialStateProperty.resolveWith<Color>(
+                  (states) {
+                    if (states.contains(MaterialState.hovered)) {
+                      return Colors.black54;
+                    }
+                    if (states.contains(MaterialState.dragged)) {
+                      return Colors.black87;
+                    }
+                    return Colors.black;
+                  },
+                ),
+                thickness: MaterialStateProperty.all(8),
+                radius: const Radius.circular(10),
+              ),
+              child: Scrollbar(
+                controller: _scrollController,
+                thumbVisibility: true,
+child: SingleChildScrollView(
                 controller: _scrollController,
                 scrollDirection: Axis.horizontal,
                 child: ConstrainedBox(
@@ -117,15 +133,16 @@ class ElectronicTableState extends State<ElectronicTable> {
                           DataCell(Center(child: Text(data['numero_producto']?.toString() ?? 'N/A'))),
                           DataCell(Center(child: Text(data['numero_serie']?.toString() ?? 'N/A'))),
                           DataCell(Center(child: Text(data['antiguedad']?.toString() ?? 'N/A'))),
-                          DataCell(Center(
+                           DataCell(Center(
                                 child: Text(
                                     "\$${double.tryParse(data['valor_aprox']?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'}", textAlign: TextAlign.center,))),
                           DataCell(Center(child: Text(data['responsable']?.toString() ?? 'N/A'))),
                           DataCell(Center(child: Text(data['responsabilidad']?.toString() ?? 'N/A'))),
                           DataCell(Center(child: Text(data['ubicacion']?.toString() ?? 'N/A'))),
-                        ],
-                      );
-                    }).toList(),
+                          ],
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
               ),

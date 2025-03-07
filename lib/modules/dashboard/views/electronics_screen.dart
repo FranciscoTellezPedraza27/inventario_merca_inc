@@ -13,7 +13,7 @@ class ElectronicsScreen extends StatefulWidget {
 }
 
 class _ElectronicsScreenState extends State<ElectronicsScreen> {
-  final GlobalKey<ElectronicTableState> _inventoryTableKey = GlobalKey<ElectronicTableState>();
+  final GlobalKey<ElectronicTableState> _electronicTableKey = GlobalKey<ElectronicTableState>();
 
   void _navigateToAddProduct(BuildContext context) {
     showDialog(
@@ -47,13 +47,13 @@ class _ElectronicsScreenState extends State<ElectronicsScreen> {
           TopBar(title: "Electrónicos"),
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
-            onSearch: (query) => _inventoryTableKey.currentState?.updateSearchQuery(query),
+            onSearch: (query) => _electronicTableKey.currentState?.updateSearchQuery(query),
           ),
           const SizedBox(height: 10),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ElectronicTable(key: _inventoryTableKey),
+              child: ElectronicTable(key: _electronicTableKey),
             ),
           ),
         ],

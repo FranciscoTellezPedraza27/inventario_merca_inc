@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AddPapeleriaScreen extends StatefulWidget {
-  const AddPapeleriaScreen({super.key});
+class AddSublimacionScreen extends StatefulWidget {
+  const AddSublimacionScreen({super.key});
 
   @override
-  _AddPapeleriaScreenState createState() => _AddPapeleriaScreenState();
+  _AddSublimacionScreenState createState() => _AddSublimacionScreenState();
 }
 
-class _AddPapeleriaScreenState extends State<AddPapeleriaScreen> {
+class _AddSublimacionScreenState extends State<AddSublimacionScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _cantidad = TextEditingController();
   final TextEditingController _articuloController = TextEditingController();
@@ -23,10 +23,10 @@ class _AddPapeleriaScreenState extends State<AddPapeleriaScreen> {
   final TextEditingController _reciboInstrucController = TextEditingController();
   final TextEditingController _ubicacionController = TextEditingController();
 
-  Future<void> _addElectronic() async {
+  Future<void> _addSublimacion() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await FirebaseFirestore.instance.collection('papeleria').doc().set({
+        await FirebaseFirestore.instance.collection('sublimacion').doc().set({
           'cantidad': _cantidad.text,
           'articulo': _articuloController.text,
           'marca': _marcaController.text,
@@ -92,7 +92,7 @@ class _AddPapeleriaScreenState extends State<AddPapeleriaScreen> {
                   child: const Text('Cancelar'),
                 ),
                 ElevatedButton(
-                  onPressed: _addElectronic,
+                  onPressed: _addSublimacion,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
