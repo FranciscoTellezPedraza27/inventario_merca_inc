@@ -24,38 +24,39 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
   final TextEditingController _ubicacionController = TextEditingController();
 
   Future<void> _addElectronic() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        await FirebaseFirestore.instance.collection('electronicos').doc().set({
-          'cantidad': _cantidad.text,
-          'articulo': _articuloController.text,
-          'marca': _marcaController.text,
-          'modelo': _modeloController.text,
-          'especificaciones': _especificacionesController.text,
-          'numero_producto': _numeroProductoController.text,
-          'numero_serie': _numeroSerieController.text,
-          'antiguedad': _antiguedadController.text,
-          'valor_aprox': double.parse(_valorAproxController.text),
-          'responsable': _responsableController.text,
-          'responsabilidad': _responsabilidadController.text,
-          'ubicacion': _ubicacionController.text,
-          'timestamp': FieldValue.serverTimestamp(), // Agregar marca de tiempo
-        });
-        Navigator.pop(context);
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    try {
+      await FirebaseFirestore.instance.collection('electronicos').doc().set({
+        'cantidad': int.parse(_cantidad.text),
+        'articulo': _articuloController.text,
+        'marca': _marcaController.text,
+        'modelo': _modeloController.text,
+        'especificaciones': _especificacionesController.text,
+        'numero_producto': _numeroProductoController.text,
+        'numero_serie': _numeroSerieController.text,
+        'antiguedad': _antiguedadController.text,
+        'valor_aprox': double.parse(_valorAproxController.text),
+        'responsable': _responsableController.text,
+        'responsabilidad': _responsabilidadController.text,
+        'ubicacion': _ubicacionController.text,
+        'timestamp': FieldValue.serverTimestamp(), // Agregar marca de tiempo
+      });
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          child: Column(
+      padding: const EdgeInsets.all(20.0),
+      child: SingleChildScrollView(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
@@ -67,7 +68,7 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  _buildTextField(_cantidad, 'Cantidad'),
+                  _buildTextField(_cantidad, 'Cantidad', isNumber: true),
                   _buildTextField(_articuloController, 'Nombre del artículo'),
                   _buildTextField(_marcaController, 'Marca del artículo'),
                   _buildTextField(_modeloController, 'Modelo del artículo'),
@@ -105,8 +106,8 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
             ),
           ],
         ),
-        )
-      );
+      ),
+    );
   }
 
   Widget _buildTextField(TextEditingController controller, String label, {bool isNumber = false}) {
@@ -119,11 +120,12 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           filled: true,
           fillColor: Colors.grey[200],
+          errorStyle: TextStyle(color: Colors.red),
         ),
         keyboardType: isNumber ? TextInputType.number : TextInputType.text,
         validator: (value) {
           if (value == null || value.isEmpty) return 'Campo requerido';
-          if (isNumber && num.tryParse(value) == null) return 'Valor inválido';
+          if (isNumber && int.tryParse(value) == null) return 'Ingrese un número válido';
           return null;
         },
       ),

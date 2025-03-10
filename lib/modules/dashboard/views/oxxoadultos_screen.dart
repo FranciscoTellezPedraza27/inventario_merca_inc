@@ -48,6 +48,9 @@ class _OxxoAdultosScreenState extends State<OxxoAdultosScreen> {
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _oxxoAdultosTableKey.currentState?.updateSearchQuery(query),
+            onGeneratePDF:() {
+              
+            },
           ),
           const SizedBox(height: 10),
           Expanded(

@@ -48,6 +48,9 @@ class _LimpiezaScreenState extends State<LimpiezaScreen> {
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _limpiezaTableKey.currentState?.updateSearchQuery(query),
+            onGeneratePDF: () {
+              
+            },
           ),
           const SizedBox(height: 10),
           Expanded(

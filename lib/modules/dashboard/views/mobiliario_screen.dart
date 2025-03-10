@@ -48,6 +48,9 @@ class _MobiliarioScreenState extends State<MobiliarioScreen> {
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _mobiliarioTableKey.currentState?.updateSearchQuery(query),
+            onGeneratePDF: (){
+              
+            },
           ),
           const SizedBox(height: 10),
           Expanded(

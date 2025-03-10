@@ -48,6 +48,9 @@ class _OtrosScreenState extends State<OtrosScreen> {
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _otrosTableKey.currentState?.updateSearchQuery(query),
+            onGeneratePDF: () {
+              
+            },
           ),
           const SizedBox(height: 10),
           Expanded(

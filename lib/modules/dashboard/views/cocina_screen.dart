@@ -48,6 +48,9 @@ class _CocinaScreenState extends State<CocinaScreen> {
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _cocinaTableKey.currentState?.updateSearchQuery(query),
+            onGeneratePDF: (){
+              
+            },
           ),
           const SizedBox(height: 10),
           Expanded(

@@ -48,6 +48,9 @@ class _HerramientasScreenState extends State<HerramientasScreen> {
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _herramientasTableKey.currentState?.updateSearchQuery(query),
+            onGeneratePDF: () {
+              
+            },
           ),
           const SizedBox(height: 10),
           Expanded(

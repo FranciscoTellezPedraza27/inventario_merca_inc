@@ -47,6 +47,9 @@ class _SublimacionScreenState extends State<SublimacionScreen> {
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _sbulimacionTableKey.currentState?.updateSearchQuery(query),
+            onGeneratePDF: () {
+              
+            },
           ),
           const SizedBox(height: 10),
           Expanded(

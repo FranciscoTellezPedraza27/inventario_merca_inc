@@ -48,6 +48,9 @@ class _ProduccionScreenState extends State<ProduccionScreen> {
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _produccionTableKey.currentState?.updateSearchQuery(query),
+            onGeneratePDF: () {
+              
+            },
           ),
           const SizedBox(height: 10),
           Expanded(
