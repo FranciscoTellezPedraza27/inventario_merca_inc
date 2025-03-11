@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:inventario_merca_inc/modules/auth/controllers/report_config.dart';
+import 'package:inventario_merca_inc/modules/auth/services/pdf_service.dart';
+import 'package:printing/printing.dart';
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SearchBarWidget extends StatelessWidget {
   final VoidCallback onAddProduct;
   final Function(String) onSearch;
-  final VoidCallback onGeneratePDF;
+  final ReportConfig pdfConfig;
 
   const SearchBarWidget({
     super.key,
     required this.onAddProduct,
     required this.onSearch,
-    required this.onGeneratePDF,
+    required this.pdfConfig,
   });
 
   @override
@@ -67,7 +73,7 @@ class SearchBarWidget extends StatelessWidget {
                     icon: Icons.picture_as_pdf,
                     label: "Generar PDF",
                     color: const Color(0xFF009FE3),
-                    onPressed: onGeneratePDF,
+                    onPressed: () => _generatePDF(context),
                   ),
                 ],
               ),
@@ -76,6 +82,35 @@ class SearchBarWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _generatePDF(BuildContext context) async {
+    try {
+      // Obtener datos de Firestore usando la configuración
+      final data = await FirebaseFirestore.instance
+          .collection(pdfConfig.collection)
+          .get()
+          .then((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+
+      // Cargar imagen de fondo
+      final ByteData imageData = await rootBundle.load('lib/images/Fondo_Reporte.jpg');
+      final Uint8List backgroundImage = imageData.buffer.asUint8List();
+
+      // Generar PDF usando la configuración
+      final pdfBytes = await PdfService.generatePDF(
+        config: pdfConfig,
+        data: data,
+        backgroundImage: backgroundImage,
+      );
+
+      // Mostrar diálogo de impresión
+      await Printing.layoutPdf(onLayout: (_) => pdfBytes);
+    } catch (e) {
+      print("Error al generar PDF: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error al generar el PDF")),
+      );
+    }
   }
 
   Widget _buildButton({

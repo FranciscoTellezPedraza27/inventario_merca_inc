@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventario_merca_inc/modules/auth/controllers/report_config.dart';
 import 'package:inventario_merca_inc/modules/dashboard/views/add_electronic_screen.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/search_bar.dart';
@@ -35,9 +36,12 @@ class _ElectronicsScreenState extends State<ElectronicsScreen> {
     padding: const EdgeInsets.symmetric(horizontal: 0),
     child: SearchBarWidget(
       onAddProduct: () => _navigateToAddProduct(context),
-      onGeneratePDF: () {
-        // Lógica para PDF
-      },
+       pdfConfig: ReportConfig(
+    title: "Reporte de Electrónicos",
+    collection: "electronicos",
+    headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad"],
+    fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad"],
+  ),
       onSearch: (query) => _electronicTableKey.currentState?.updateSearchQuery(query),
     ),
   );

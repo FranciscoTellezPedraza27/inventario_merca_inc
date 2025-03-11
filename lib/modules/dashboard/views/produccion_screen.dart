@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventario_merca_inc/modules/auth/controllers/report_config.dart';
 import 'package:inventario_merca_inc/modules/dashboard/views/add_produccion_screen.dart';
 import 'package:inventario_merca_inc/modules/dashboard/widgets/produccion_table.dart';
 import '../widgets/sidebar.dart';
@@ -48,9 +49,12 @@ class _ProduccionScreenState extends State<ProduccionScreen> {
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _produccionTableKey.currentState?.updateSearchQuery(query),
-            onGeneratePDF: () {
-              
-            },
+ pdfConfig: ReportConfig(
+    title: "Reporte de Papelería",
+    collection: "papeleria",
+    headers: ["Cantidad", "Material", "Tipo", "Color", "Proveedor"],
+    fields: ["cantidad", "material", "tipo", "color", "proveedor"],
+  ),
           ),
           const SizedBox(height: 10),
           Expanded(

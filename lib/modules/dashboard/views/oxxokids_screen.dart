@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventario_merca_inc/modules/auth/controllers/report_config.dart';
 import 'package:inventario_merca_inc/modules/dashboard/views/add_oxxokids_screen.dart';
 import 'package:inventario_merca_inc/modules/dashboard/widgets/oxxokids_table.dart';
 import '../widgets/sidebar.dart';
@@ -48,9 +49,12 @@ class _OxxoKidsScreenState extends State<OxxoKidsScreen> {
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _oxxoKidsTableKey.currentState?.updateSearchQuery(query),
-            onGeneratePDF: () {
-              
-            },
+ pdfConfig: ReportConfig(
+    title: "Reporte de Papelería",
+    collection: "papeleria",
+    headers: ["Cantidad", "Material", "Tipo", "Color", "Proveedor"],
+    fields: ["cantidad", "material", "tipo", "color", "proveedor"],
+  ),
           ),
           const SizedBox(height: 10),
           Expanded(
