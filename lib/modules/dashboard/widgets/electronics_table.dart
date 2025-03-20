@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:remixicon/remixicon.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ElectronicTable extends StatefulWidget {
   const ElectronicTable({Key? key}) : super(key: key);
@@ -10,20 +12,19 @@ class ElectronicTable extends StatefulWidget {
 
 class ElectronicTableState extends State<ElectronicTable> {
   String _searchQuery = "";
-  final ScrollController _scrollController =
-      ScrollController(); // Controlador para el scroll
+  final ScrollController _horizontalScrollController = ScrollController();
+  final ScrollController _verticalScrollController = ScrollController();
+  final double _actionsColumnWidth = 150.0;
 
   @override
   void initState() {
     super.initState();
-    actualizarTimestamp(); // Ejecutar la función al iniciar
+    actualizarTimestamp();
   }
 
-  // Función para actualizar los documentos antiguos sin timestamp
   void actualizarTimestamp() async {
     var instance = FirebaseFirestore.instance;
     var docs = await instance.collection('electronicos').get();
-
     for (var doc in docs.docs) {
       if (!doc.data().containsKey('timestamp')) {
         await instance.collection('electronicos').doc(doc.id).update({
@@ -39,124 +40,65 @@ class ElectronicTableState extends State<ElectronicTable> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.all(6.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8.0),
-          boxShadow: [
-            BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1),
-          ],
+@override
+Widget build(BuildContext context) {
+  return Expanded(
+    child: Container(
+      margin: const EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+      ),
+      child: ScrollbarTheme(
+        data: ScrollbarThemeData(
+          thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
+            if (states.contains(MaterialState.hovered)) return Colors.black54;
+            if (states.contains(MaterialState.dragged)) return Colors.black87;
+            return Colors.black;
+          }),
+          thickness: MaterialStateProperty.all(8),
+          radius: const Radius.circular(10),
         ),
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('electronicos')
-              .orderBy('timestamp',
-                  descending: false) // Ahora se puede ordenar por timestamp
-              .snapshots(),
+          stream: FirebaseFirestore.instance.collection('electronicos').orderBy('timestamp').snapshots(),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+            if (snapshot.connectionState == ConnectionState.waiting) return _loadingIndicator();
+            if (snapshot.hasError) return _errorWidget(snapshot.error.toString());
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return _emptyState();
 
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
+            final filteredData = _filterData(snapshot.data!.docs);
 
-            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(child: Text('No hay datos disponibles.'));
-            }
-
-            final ElectronicData = snapshot.data!.docs;
-
-            // Filtrar datos basados en la búsqueda
-            final filteredData = ElectronicData.where((document) {
-              final data = document.data() as Map<String, dynamic>? ?? {};
-              final nombre = data['articulo']?.toString().toLowerCase() ?? "";
-              final codigo = data['marca']?.toString().toLowerCase() ?? "";
-
-              return nombre.contains(_searchQuery) ||
-                  codigo.contains(_searchQuery);
-            }).toList();
-
-            return ScrollbarTheme(
-              data: ScrollbarThemeData(
-                thumbColor: MaterialStateProperty.resolveWith<Color>(
-                  (states) {
-                    if (states.contains(MaterialState.hovered)) {
-                      return Colors.black54;
-                    }
-                    if (states.contains(MaterialState.dragged)) {
-                      return Colors.black87;
-                    }
-                    return Colors.black;
-                  },
-                ),
-                thickness: MaterialStateProperty.all(8),
-                radius: const Radius.circular(10),
-              ),
+            return Scrollbar(
+              controller: _verticalScrollController,
+              thumbVisibility: true,
               child: Scrollbar(
-                controller: _scrollController,
+                controller: _horizontalScrollController,
                 thumbVisibility: true,
+                notificationPredicate: (_) => true,
                 child: SingleChildScrollView(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(minWidth: 1200),
-                    child: DataTable(
-                      columnSpacing: 30,
-                      headingRowHeight: 56,
-                      dataRowHeight: 50,
-                      columns: const [
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Cantidad", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Artículo", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Marca", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Modelo", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Especificaciones", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Número de producto", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Número de serie", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Antigüedad", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Valor Aproximado", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Responsable", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Responsabilidad", textAlign: TextAlign.center)))),
-                        DataColumn(label: SizedBox(width: 150, child: Center(child: Text("Ubicación", textAlign: TextAlign.center)))),
-                      ],
-                      rows: filteredData.map((document) {
-                        final data =
-                            document.data() as Map<String, dynamic>? ?? {};
-                        return DataRow(
-                          cells: [
-                            DataCell(Center(child: Text('${data['cantidad'] ?? 0}'))),
-                            DataCell(Center(child: Text(data['articulo']?.toString() ?? 'N/A'))),
-                            DataCell(Center(child:Text(data['marca']?.toString() ?? 'N/A'))),
-                            DataCell(Center(child:Text(data['modelo']?.toString() ?? 'N/A'))),
-                            DataCell(
-  Center(
-    child: SizedBox(
-      width: 190, // Ajusta el ancho según sea necesario
-      child: Text(
-        data['especificaciones']?.toString() ?? 'N/A',
-        textAlign: TextAlign.center,
-        overflow: TextOverflow.ellipsis, // Agrega puntos suspensivos si el texto es muy largo
-        maxLines: 2, // Define el número máximo de líneas visibles
-      ),
-    ),
-  ),
-),
-
-                            DataCell(Center(child: Text(data['numero_producto']?.toString() ??'N/A'))),
-                            DataCell(Center(child: Text(data['numero_serie']?.toString() ??'N/A'))),
-                            DataCell(Center(child: Text(data['antiguedad']?.toString() ?? 'N/A'))),
-                            DataCell(Center(child: Text("\$${double.tryParse(data['valor_aprox']?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'}",textAlign: TextAlign.center))),
-                            DataCell(Center(child: Text(data['responsable']?.toString() ?? 'N/A'))),
-                            DataCell(Center(child: Text(data['responsabilidad']?.toString() ??'N/A'))),
-                            DataCell(Center(child: Text(data['ubicacion']?.toString() ?? 'N/A'))),
-                          ],
-                        );
-                      }).toList(),
+                  controller: _verticalScrollController,
+                  scrollDirection: Axis.vertical,
+                  child: SingleChildScrollView(
+                    controller: _horizontalScrollController,
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: MediaQuery.of(context).size.width,
+                        minHeight: MediaQuery.of(context).size.height,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildMainDataTable(filteredData),
+                          Container(
+                            width: _actionsColumnWidth,
+                            color: Colors.white,
+                            child: _buildActionsColumn(filteredData),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -165,6 +107,199 @@ class ElectronicTableState extends State<ElectronicTable> {
           },
         ),
       ),
+    ),
+  );
+}
+
+  // Método para construir encabezados uniformes
+  DataColumn _buildHeader(String text) {
+  return DataColumn(
+    label: SizedBox(
+      width: 140, // Aumentar ancho para columnas largas
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.black87,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+  Widget _buildMainDataTable(List<QueryDocumentSnapshot> filteredData) {
+  return DataTable(
+    columnSpacing: 30,
+    headingRowHeight: 60,
+    dataRowHeight: 80,
+    columns: [
+      _buildHeader("Cantidad"),
+      _buildHeader("Artículo"),
+      _buildHeader("Marca"),
+      _buildHeader("Modelo"),
+      _buildHeader("Especificaciones"),
+      _buildHeader("N° Producto"),
+      _buildHeader("N° Serie"),
+      _buildHeader("Antigüedad"),
+      _buildHeader("Valor Aprox."),
+      _buildHeader("Responsable"),
+      _buildHeader("Responsabilidad"),
+      _buildHeader("Ubicación"),
+      _buildHeader("Imagen"),
+    ],
+    rows: filteredData.map((document) => _buildDataRow(document)).toList(),
+  );
+}
+
+  Widget _buildActionsColumn(List<QueryDocumentSnapshot> filteredData) {
+    return DataTable(
+      columnSpacing: 0,
+      headingRowHeight: 60,
+      dataRowHeight: 80,
+      columns: const [
+        DataColumn(
+          label: Center(
+            child: Text(
+              "Acciones",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+        ),
+      ],
+      rows: List.generate(filteredData.length, (index) {
+        return DataRow(
+          cells: [
+            DataCell(
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: Icon(Remix.add_large_line, color: Colors.green),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Remix.edit_box_line, color: Color(0xFFF6A000)),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Remix.delete_bin_line, color: Color(0xFF971B81)),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
+
+  List<QueryDocumentSnapshot> _filterData(List<QueryDocumentSnapshot> docs) {
+    return docs.where((document) {
+      final data = document.data() as Map<String, dynamic>;
+      final nombre = data['articulo']?.toString().toLowerCase() ?? "";
+      final codigo = data['marca']?.toString().toLowerCase() ?? "";
+      return nombre.contains(_searchQuery) || codigo.contains(_searchQuery);
+    }).toList();
+  }
+
+  DataRow _buildDataRow(QueryDocumentSnapshot document) {
+    final data = document.data() as Map<String, dynamic>;
+    final imageUrl = data['imagen_url']?.toString();
+    
+    return DataRow(
+      cells: [
+        _buildDataCell('${data['cantidad'] ?? 0}'),
+        _buildDataCell(data['articulo']?.toString()),
+        _buildDataCell(data['marca']?.toString()),
+        _buildDataCell(data['modelo']?.toString()),
+        _buildDataCell(data['especificaciones']?.toString(), isWide: true),
+        _buildDataCell(data['numero_producto']?.toString()),
+        _buildDataCell(data['numero_serie']?.toString()),
+        _buildDataCell(data['antiguedad']?.toString()),
+        _buildDataCell("\$${double.tryParse(data['valor_aprox']?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'}"),
+        _buildDataCell(data['responsable']?.toString()),
+        _buildDataCell(data['responsabilidad']?.toString()),
+        _buildDataCell(data['ubicacion']?.toString()),
+        DataCell(
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Center(
+              child: imageUrl != null && imageUrl != 'N/A' 
+                ? CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => const Icon(Icons.error))
+                : const Text('N/A')
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  DataCell _buildDataCell(String? text, {bool isWide = false}) {
+    return DataCell(
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Center(
+          child: SizedBox(
+            width: isWide ? 190 : null,
+            child: Text(
+              text ?? 'N/A',
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: isWide ? 3 : 2,
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _loadingIndicator() => Center(
+    child: Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: CircularProgressIndicator(),
+    ),
+  );
+
+  Widget _errorWidget(String error) => Center(
+    child: Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Text(
+        'Error: $error',
+        style: const TextStyle(color: Colors.red),
+      ),
+    ),
+  );
+
+  Widget _emptyState() => Center(
+    child: Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Text(
+        'No hay datos disponibles',
+        style: TextStyle(color: Colors.grey),
+      ),
+    ),
+  );
 }

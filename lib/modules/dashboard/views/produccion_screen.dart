@@ -45,7 +45,7 @@ class _ProduccionScreenState extends State<ProduccionScreen> {
       drawer: const Sidebar(),
       body: Column(
         children: [
-          TopBar(title: "Papelería"),
+          TopBar(title: "Producción"),
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _produccionTableKey.currentState?.updateSearchQuery(query),

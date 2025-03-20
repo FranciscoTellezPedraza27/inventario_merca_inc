@@ -45,7 +45,7 @@ class _OxxoKidsScreenState extends State<OxxoKidsScreen> {
       drawer: const Sidebar(),
       body: Column(
         children: [
-          TopBar(title: "Papelería"),
+          TopBar(title: "OXXO Kids"),
           SearchBarWidget(
             onAddProduct: () => _navigateToAddProduct(context),
             onSearch: (query) => _oxxoKidsTableKey.currentState?.updateSearchQuery(query),

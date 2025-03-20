@@ -10,4 +10,5 @@ class ReportConfig {
     required this.headers,
     required this.fields,
   });
+  
 }

@@ -31,10 +31,27 @@ class _CocinaScreenState extends State<CocinaScreen> {
     );
   }
 
+  Widget _buildActionButtons() {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 0),
+    child: SearchBarWidget(
+      onAddProduct: () => _navigateToAddProduct(context),
+       pdfConfig: ReportConfig(
+    title: "Reporte de Electrónicos",
+    collection: "electronicos",
+    headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad"],
+    fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad"],
+  ),
+      onSearch: (query) => _cocinaTableKey.currentState?.updateSearchQuery(query),
+    ),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text("Cocina"),
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),
@@ -45,17 +62,7 @@ class _CocinaScreenState extends State<CocinaScreen> {
       drawer: const Sidebar(),
       body: Column(
         children: [
-          TopBar(title: "Papelería"),
-          SearchBarWidget(
-            onAddProduct: () => _navigateToAddProduct(context),
-            onSearch: (query) => _cocinaTableKey.currentState?.updateSearchQuery(query),
- pdfConfig: ReportConfig(
-    title: "Reporte de Papelería",
-    collection: "papeleria",
-    headers: ["Cantidad", "Material", "Tipo", "Color", "Proveedor"],
-    fields: ["cantidad", "material", "tipo", "color", "proveedor"],
-  ),
-          ),
+          _buildActionButtons(),
           const SizedBox(height: 10),
           Expanded(
             child: Padding(

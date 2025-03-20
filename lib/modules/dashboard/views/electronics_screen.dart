@@ -4,7 +4,7 @@ import 'package:inventario_merca_inc/modules/dashboard/views/add_electronic_scre
 import '../widgets/sidebar.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/electronics_table.dart';
-import 'package:remixicon/remixicon.dart';
+//import 'package:remixicon/remixicon.dart';
 
 class ElectronicsScreen extends StatefulWidget {
   const ElectronicsScreen({Key? key}) : super(key: key);
@@ -39,8 +39,8 @@ class _ElectronicsScreenState extends State<ElectronicsScreen> {
        pdfConfig: ReportConfig(
     title: "Reporte de Electrónicos",
     collection: "electronicos",
-    headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad"],
-    fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad"],
+    headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Responsabilidad", "Ubicación"],
+    fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "responsabilidad", "ubicacion"],
   ),
       onSearch: (query) => _electronicTableKey.currentState?.updateSearchQuery(query),
     ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:inventario_merca_inc/widgets/custom_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,12 +14,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void _signIn() async {
-    print("🔥 FirebaseAuth está inicializado: \${_auth.app.name}");
-    print("📩 Correo ingresado: \${_emailController.text}");
-    print("🔑 Contraseña ingresada: \${_passwordController.text}");
-
-    String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
       _showError("Por favor, completa todos los campos.");
@@ -28,14 +23,12 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      print("✅ Usuario autenticado: \${userCredential.user?.email}");
       Navigator.pushReplacementNamed(context, '/dashboard');
     } catch (e) {
-      print("❌ Error en login: $e");
       _showError("Error al iniciar sesión. Verifica tus credenciales.");
     }
   }
@@ -51,86 +44,103 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Row(
         children: [
-          Expanded(
-            flex: 3,
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('lib/images/Silla_Inicio.jpg'),
-                  fit: BoxFit.cover,
-                ),
+          // Sección de imagen (50%)
+          Container(
+            width: MediaQuery.of(context).size.width * 0.5,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('lib/images/FondoLogin.jpg'),
+                fit: BoxFit.cover,
               ),
             ),
           ),
+
+          // Espacio restante + formulario centrado
           Expanded(
-            flex: 3,
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'B&L MUEBLES',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  SizedBox(height: 24),
-                  Text(
-                    'Iniciar Sesión',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  SizedBox(height: 16),
-                  // Prueba con un TextField normal para verificar si el problema está en CustomTextField
-                  TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Correo',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Contraseña',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        print("🔘 Botón presionado"); // Verificar que el botón funciona
-                        _signIn();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: Text('Continuar'),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/register');
-                      },
-                      child: Text(
-                        '¿Aún no tienes una cuenta? Regístrate',
-                        style: TextStyle(
-                          color: Colors.blue,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 90),
+              color: Colors.white,
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 900),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Iniciar Sesión',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[900],
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 30),
+                        _buildInputField('Correo', _emailController),
+                        const SizedBox(height: 15),
+                        _buildInputField('Contraseña', _passwordController, isPassword: true),
+                        const SizedBox(height: 30),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _signIn,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              backgroundColor: Colors.blue[800],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text(
+                              'Continuar',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        /*TextButton(
+                          onPressed: () => Navigator.pushNamed(context, '/register'),
+                          child: Text(
+                            '¿Aún no tienes una cuenta? Regístrate',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blue[800],
+                            ),
+                          ),
+                        ),*/
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildInputField(String label, TextEditingController controller, {bool isPassword = false}) {
+    return TextField(
+      controller: controller,
+      obscureText: isPassword,
+      decoration: InputDecoration(
+        labelText: label,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.blue[800]!),
+        ))
     );
   }
 }

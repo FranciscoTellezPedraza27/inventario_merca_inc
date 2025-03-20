@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remixicon/remixicon.dart';
 
 class TopBar extends StatelessWidget {
   final String title;
@@ -9,7 +10,7 @@ class TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 60,
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
@@ -17,12 +18,22 @@ class TopBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: TextStyle(fontSize: 22)),
+          Text(title, style: const TextStyle(fontSize: 22)),
           Row(
             children: [
-              Icon(Icons.notifications),
-              SizedBox(width: 10),
-              CircleAvatar(
+              // Ícono de notificaciones
+              IconButton(
+                icon: Icon(
+                  Remix.notification_3_line,
+                  color: Colors.grey[800],
+                  size: 24,
+                ),
+                onPressed: () {
+                  // Lógica de notificaciones
+                },
+              ),
+              const SizedBox(width: 10),
+              const CircleAvatar(
                 backgroundImage: AssetImage('assets/images/user_avatar.png'),
               ),
             ],
