@@ -38,6 +38,7 @@ flutter:
     - lib/images/Silla_Inicio.jpg
     - lib/images/Fondo_Reporte.jpg
     - lib/images/FondoLogin.jpg
+    - lib/images/Hoja_Membretada.jpg
 
   fonts:
     - family: Poppins

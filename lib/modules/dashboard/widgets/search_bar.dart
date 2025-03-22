@@ -93,7 +93,7 @@ class SearchBarWidget extends StatelessWidget {
           .then((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
 
       // Cargar imagen de fondo
-      final ByteData imageData = await rootBundle.load('lib/images/Fondo_Reporte.jpg');
+      final ByteData imageData = await rootBundle.load('lib/images/Hoja_Membretada.jpg');
       final Uint8List backgroundImage = imageData.buffer.asUint8List();
 
       // Generar PDF usando la configuración
