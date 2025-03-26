@@ -14,8 +14,8 @@ class PdfService {
     final pdf = pw.Document();
     final image = pw.MemoryImage(backgroundImage);
     final fechaGeneracion = DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now());
-
-    const int maxRowsPerPage = 13; // 14 en total contando encabezado
+    
+   const int maxRowsPerPage = 13; // 14 en total contando encabezado
     int totalPages = (data.length / maxRowsPerPage).ceil();
 
     for (int i = 0; i < totalPages; i++) {

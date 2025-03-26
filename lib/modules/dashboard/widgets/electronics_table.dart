@@ -15,16 +15,36 @@ class ElectronicTableState extends State<ElectronicTable> {
   final ScrollController _horizontalScrollController = ScrollController();
   final ScrollController _verticalScrollController = ScrollController();
   final double _actionsColumnWidth = 150.0;
+  final ScrollController _dummyHorizontalController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     actualizarTimestamp();
+    _setupScrollSync(); // Añadir este método
   }
 
+  void _setupScrollSync() {
+    _horizontalScrollController.addListener(() {
+      if (_dummyHorizontalController.hasClients &&
+          _dummyHorizontalController.offset != _horizontalScrollController.offset) {
+        _dummyHorizontalController.jumpTo(_horizontalScrollController.offset);
+      }
+    });
+
+    _dummyHorizontalController.addListener(() {
+      if (_horizontalScrollController.hasClients &&
+          _horizontalScrollController.offset != _dummyHorizontalController.offset) {
+        _horizontalScrollController.jumpTo(_dummyHorizontalController.offset);
+      }
+    });
+  }
+
+  // Función para actualizar los documentos antiguos sin timestamp
   void actualizarTimestamp() async {
     var instance = FirebaseFirestore.instance;
     var docs = await instance.collection('electronicos').get();
+
     for (var doc in docs.docs) {
       if (!doc.data().containsKey('timestamp')) {
         await instance.collection('electronicos').doc(doc.id).update({
@@ -40,8 +60,18 @@ class ElectronicTableState extends State<ElectronicTable> {
     });
   }
 
+   @override
+  void dispose() {
+    _dummyHorizontalController.dispose(); // Añadir a dispose
+    super.dispose();
+  }
+
+
 @override
 Widget build(BuildContext context) {
+  // Remover esta línea: final ScrollController _dummyHorizontalController = ScrollController();
+  final totalColumnsWidth = (140.0 * 12) + 190.0 + (30.0 * 12);
+
   return Expanded(
     child: Container(
       margin: const EdgeInsets.all(6.0),
@@ -69,42 +99,97 @@ Widget build(BuildContext context) {
 
             final filteredData = _filterData(snapshot.data!.docs);
 
-            return Scrollbar(
-              controller: _verticalScrollController,
-              thumbVisibility: true,
-              child: Scrollbar(
-                controller: _horizontalScrollController,
-                thumbVisibility: true,
-                notificationPredicate: (_) => true,
-                child: SingleChildScrollView(
+            return Stack(
+              children: [
+                Scrollbar(
                   controller: _verticalScrollController,
-                  scrollDirection: Axis.vertical,
+                  thumbVisibility: true,
                   child: SingleChildScrollView(
-                    controller: _horizontalScrollController,
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: MediaQuery.of(context).size.width,
-                        minHeight: MediaQuery.of(context).size.height,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    controller: _verticalScrollController,
+                    scrollDirection: Axis.vertical,
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: Stack(
                         children: [
-                          _buildMainDataTable(filteredData),
-                          Container(
-                            width: _actionsColumnWidth,
-                            color: Colors.white,
-                            child: _buildActionsColumn(filteredData),
+                          SingleChildScrollView(
+                            controller: _horizontalScrollController,
+                            scrollDirection: Axis.horizontal,
+                            child: Container(
+                              margin: EdgeInsets.only(right: _actionsColumnWidth),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minWidth: totalColumnsWidth,
+                                  maxWidth: totalColumnsWidth,
+                                ),
+                                child: _buildMainDataTable(filteredData),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            bottom: 0,
+                            child: Container(
+                              width: _actionsColumnWidth,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    offset: Offset(-4, 0),
+                                    blurRadius: 8,
+                                    spreadRadius: 2
+                                  )
+                                ],
+                              ),
+                              child: _buildActionsColumn(filteredData),
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-              ),
+                // Scroll horizontal fijo
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: _actionsColumnWidth,
+                  child: _buildHorizontalScrollControl(totalColumnsWidth),
+                ),
+              ],
             );
-          },
+          }
+        )
+      )
+    )
+  );  
+
+}
+Widget _buildHorizontalScrollControl(double totalWidth) {
+  return Container(
+    height: 12,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black12,
+          blurRadius: 4,
+          spreadRadius: 1,
+          offset: Offset(0, -2))
+      ],
+    ),
+    child: Scrollbar(
+      controller: _dummyHorizontalController,
+      thumbVisibility: true,
+      trackVisibility: true,
+      child: SingleChildScrollView(
+        controller: _dummyHorizontalController,
+        scrollDirection: Axis.horizontal,
+        physics: ClampingScrollPhysics(),
+        child: SizedBox(
+          width: totalWidth,
+          height: 1,
         ),
       ),
     ),
