@@ -4,7 +4,7 @@ import 'package:inventario_merca_inc/modules/dashboard/views/add_electronic_scre
 import '../widgets/sidebar.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/electronics_table.dart';
-//import 'package:remixicon/remixicon.dart';
+import '../widgets/top_bar.dart'; // Asegúrate de importar el TopBar
 
 class ElectronicsScreen extends StatefulWidget {
   const ElectronicsScreen({Key? key}) : super(key: key);
@@ -32,32 +32,34 @@ class _ElectronicsScreenState extends State<ElectronicsScreen> {
   }
 
   Widget _buildActionButtons() {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 0),
-    child: SearchBarWidget(
-      onAddProduct: () => _navigateToAddProduct(context),
-       pdfConfig: ReportConfig(
-    title: "Reporte de Electrónicos",
-    collection: "electronicos",
-    headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Responsabilidad", "Ubicación", "Imagen"],
-    fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "responsabilidad", "ubicacion", "imagen"],
-  ),
-      onSearch: (query) => _electronicTableKey.currentState?.updateSearchQuery(query),
-    ),
-  );
-}
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0),
+      child: SearchBarWidget(
+        onAddProduct: () => _navigateToAddProduct(context),
+        pdfConfig: ReportConfig(
+          title: "Reporte de Electrónicos",
+          collection: "electronicos",
+          headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Responsabilidad", "Ubicación"],
+          fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "responsabilidad", "ubicacion"],
+        ),
+        onSearch: (query) => _electronicTableKey.currentState?.updateSearchQuery(query),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Electrónicos"),
+        toolbarHeight: 60,
+        backgroundColor: Colors.white,
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
+        title: TopBar(title: "Electrónicos"), // Aquí usamos el TopBar
       ),
       drawer: const Sidebar(),
       body: Column(

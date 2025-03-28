@@ -50,28 +50,40 @@ class _CocinaScreenState extends State<CocinaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Cocina"),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+  appBar: AppBar(
+    toolbarHeight: 60, // Altura del AppBar
+    backgroundColor: Colors.white, // Color de fondo
+    title: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20), // Padding horizontal
+      child: const Text("Cocina"),
+    ),
+    leading: Builder(
+      builder: (context) => IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: () => Scaffold.of(context).openDrawer(),
+      ),
+    ),
+    flexibleSpace: Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade300)
         ),
       ),
-      drawer: const Sidebar(),
-      body: Column(
-        children: [
-          _buildActionButtons(),
-          const SizedBox(height: 10),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: CocinaTable(key: _cocinaTableKey),
-            ),
-          ),
-        ],
+    ),
+  ),
+  drawer: const Sidebar(),
+  body: Column(
+    children: [
+      _buildActionButtons(),
+      const SizedBox(height: 10),
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: CocinaTable(key: _cocinaTableKey),
+        ),
       ),
-    );
+    ],
+  ),
+);
   }
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:inventario_merca_inc/modules/auth/controllers/report_config.dart';
 import 'package:inventario_merca_inc/modules/dashboard/views/add_papeleria_screen.dart';
-import 'package:inventario_merca_inc/modules/dashboard/widgets/papeleria_table.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/search_bar.dart';
-import '../widgets/top_bar.dart';
+import '../widgets/papeleria_table.dart';
+//import 'package:remixicon/remixicon.dart';
 
 class PapeleriaScreen extends StatefulWidget {
   const PapeleriaScreen({Key? key}) : super(key: key);
@@ -16,7 +16,7 @@ class PapeleriaScreen extends StatefulWidget {
 class _PapeleriaScreenState extends State<PapeleriaScreen> {
   final GlobalKey<PapeleriaTableState> _papeleriaTableKey = GlobalKey<PapeleriaTableState>();
 
- void _navigateToAddProduct(BuildContext context) {
+  void _navigateToAddProduct(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -31,40 +31,59 @@ class _PapeleriaScreenState extends State<PapeleriaScreen> {
     );
   }
 
+  Widget _buildActionButtons() {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 0),
+    child: SearchBarWidget(
+      onAddProduct: () => _navigateToAddProduct(context),
+       pdfConfig: ReportConfig(
+    title: "Reporte de Electrónicos",
+    collection: "electronicos",
+    headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Responsabilidad", "Ubicación"],
+    fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "responsabilidad", "ubicacion"],
+  ),
+      onSearch: (query) => _papeleriaTableKey.currentState?.updateSearchQuery(query),
+    ),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+  appBar: AppBar(
+    toolbarHeight: 60, // Altura del AppBar
+    backgroundColor: Colors.white, // Color de fondo
+    title: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20), // Padding horizontal
+      child: const Text("Papelería"),
+    ),
+    leading: Builder(
+      builder: (context) => IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: () => Scaffold.of(context).openDrawer(),
+      ),
+    ),
+    flexibleSpace: Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade300)
         ),
       ),
-      drawer: const Sidebar(),
-      body: Column(
-        children: [
-          TopBar(title: "Papelería"),
-          SearchBarWidget(
-            onAddProduct: () => _navigateToAddProduct(context),
-            onSearch: (query) => _papeleriaTableKey.currentState?.updateSearchQuery(query),
- pdfConfig: ReportConfig(
-    title: "Reporte de Papelería",
-    collection: "papeleria",
-    headers: ["Cantidad", "Material", "Tipo", "Color", "Proveedor"],
-    fields: ["cantidad", "material", "tipo", "color", "proveedor"],
+    ),
   ),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: PapeleriaTable(key: _papeleriaTableKey),
-            ),
-          ),
-        ],
+  drawer: const Sidebar(),
+  body: Column(
+    children: [
+      _buildActionButtons(),
+      const SizedBox(height: 10),
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: PapeleriaTable(key: _papeleriaTableKey),
+        ),
       ),
-    );
+    ],
+  ),
+);
   }
 }

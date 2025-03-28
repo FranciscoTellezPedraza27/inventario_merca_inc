@@ -164,8 +164,8 @@ Widget build(BuildContext context) {
       )
     )
   );  
-
 }
+
 Widget _buildHorizontalScrollControl(double totalWidth) {
   return Container(
     height: 12,
@@ -200,22 +200,25 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
   DataColumn _buildHeader(String text) {
   return DataColumn(
     label: SizedBox(
-      width: 140, // Aumentar ancho para columnas largas
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-            color: Colors.black87,
+      width: 140, // Asegura un ancho suficiente
+      child: Center( // Centra el contenido dentro del SizedBox
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: Colors.black87,
+            ),
           ),
         ),
       ),
     ),
   );
 }
+
 
   Widget _buildMainDataTable(List<QueryDocumentSnapshot> filteredData) {
   return DataTable(

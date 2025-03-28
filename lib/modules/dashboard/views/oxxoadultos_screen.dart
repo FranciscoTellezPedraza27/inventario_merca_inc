@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:inventario_merca_inc/modules/auth/controllers/report_config.dart';
 import 'package:inventario_merca_inc/modules/dashboard/views/add_oxxoadultos_screen.dart';
-import 'package:inventario_merca_inc/modules/dashboard/widgets/oxxoadultos_table.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/search_bar.dart';
-import '../widgets/top_bar.dart';
+import '../widgets/oxxoadultos_table.dart';
+import '../widgets/top_bar.dart'; // Asegúrate de importar el TopBar
 
 class OxxoAdultosScreen extends StatefulWidget {
   const OxxoAdultosScreen({Key? key}) : super(key: key);
@@ -16,7 +16,7 @@ class OxxoAdultosScreen extends StatefulWidget {
 class _OxxoAdultosScreenState extends State<OxxoAdultosScreen> {
   final GlobalKey<OxxoAdultosTableState> _oxxoAdultosTableKey = GlobalKey<OxxoAdultosTableState>();
 
- void _navigateToAddProduct(BuildContext context) {
+  void _navigateToAddProduct(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -31,31 +31,40 @@ class _OxxoAdultosScreenState extends State<OxxoAdultosScreen> {
     );
   }
 
+  Widget _buildActionButtons() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0),
+      child: SearchBarWidget(
+        onAddProduct: () => _navigateToAddProduct(context),
+        pdfConfig: ReportConfig(
+          title: "Reporte de Electrónicos",
+          collection: "OxxoAdultosos",
+          headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Responsabilidad", "Ubicación"],
+          fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "responsabilidad", "ubicacion"],
+        ),
+        onSearch: (query) => _oxxoAdultosTableKey.currentState?.updateSearchQuery(query),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 60,
+        backgroundColor: Colors.white,
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
+        title: TopBar(title: "OxxoAdultos"), // Aquí usamos el TopBar
       ),
       drawer: const Sidebar(),
       body: Column(
         children: [
-          TopBar(title: "OXXO Adultos"),
-          SearchBarWidget(
-            onAddProduct: () => _navigateToAddProduct(context),
-            onSearch: (query) => _oxxoAdultosTableKey.currentState?.updateSearchQuery(query),
- pdfConfig: ReportConfig(
-    title: "Reporte de Papelería",
-    collection: "papeleria",
-    headers: ["Cantidad", "Material", "Tipo", "Color", "Proveedor"],
-    fields: ["cantidad", "material", "tipo", "color", "proveedor"],
-  ),
-          ),
+          _buildActionButtons(),
           const SizedBox(height: 10),
           Expanded(
             child: Padding(

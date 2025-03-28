@@ -10,13 +10,9 @@ import 'package:inventario_merca_inc/modules/dashboard/views/produccion_screen.d
 import '../modules/auth/views/login_page.dart';
 import '../modules/dashboard/views/dashboard_screen.dart';
 import '../modules/dashboard/views/electronics_screen.dart';
+import '../modules/dashboard/views/otros_screen.dart';
 import '../modules/dashboard/views/papeleria_screen.dart';
 import '../modules/dashboard/views/sublimacion_screen.dart';
-
-final Map<String, WidgetBuilder> appRoutes = {
-  '/login': (BuildContext context) => LoginScreen(), // Verifica que la clase exista
-  '/dashboard': (BuildContext context) => DashboardScreen(),
-};
 
 class AppRoutes {
   static const String login = '/login';
@@ -32,40 +28,69 @@ class AppRoutes {
   static const String otros = '/otros';
   static const String oxxoKids = '/oxxo_k';
   static const String oxxoAdultos = '/oxxo_a';
+  static const String historial = '/historial';
+}
 
+final Map<String, WidgetBuilder> appRoutes = {
+  AppRoutes.login: (context) => LoginScreen(),
+  AppRoutes.dashboard: (context) => DashboardScreen(),
+  AppRoutes.electronica: (context) => ElectronicsScreen(),
+  AppRoutes.papeleria: (context) => PapeleriaScreen(),
+  AppRoutes.sublimacion: (context) => SublimacionScreen(),
+  AppRoutes.mobiliario: (context) => MobiliarioScreen(),
+  AppRoutes.cocina: (context) => CocinaScreen(),
+  AppRoutes.limpieza: (context) => LimpiezaScreen(),
+  AppRoutes.herramientas: (context) => HerramientasScreen(),
+  AppRoutes.produccion: (context) => ProduccionScreen(),
+  AppRoutes.otros: (context) => OtrosScreen(),
+  AppRoutes.oxxoKids: (context) => OxxoKidsScreen(),
+  AppRoutes.oxxoAdultos: (context) => OxxoAdultosScreen(),
+  AppRoutes.historial: (context) => OtrosScreen(),
+};
+
+class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case login:
+      case AppRoutes.login:
         return MaterialPageRoute(builder: (_) => LoginScreen());
-      case dashboard:
+      case AppRoutes.dashboard:
         return MaterialPageRoute(builder: (_) => DashboardScreen());
-      case electronica:
+      case AppRoutes.electronica:
         return MaterialPageRoute(builder: (_) => ElectronicsScreen());
-      case papeleria:
+      case AppRoutes.papeleria:
         return MaterialPageRoute(builder: (_) => PapeleriaScreen());
-      case sublimacion:
+      case AppRoutes.sublimacion:
         return MaterialPageRoute(builder: (_) => SublimacionScreen());
-      case mobiliario:
+      case AppRoutes.mobiliario:
         return MaterialPageRoute(builder: (_) => MobiliarioScreen());
-      case cocina:
+      case AppRoutes.cocina:
         return MaterialPageRoute(builder: (_) => CocinaScreen());
-      case limpieza:
-        return MaterialPageRoute(builder: (_) => LimpiezaScreen());      
-      case herramientas:
-        return MaterialPageRoute(builder: (_) => HerramientasScreen()); 
-      case produccion:
+      case AppRoutes.limpieza:
+        return MaterialPageRoute(builder: (_) => LimpiezaScreen());
+      case AppRoutes.herramientas:
+        return MaterialPageRoute(builder: (_) => HerramientasScreen());
+      case AppRoutes.produccion:
         return MaterialPageRoute(builder: (_) => ProduccionScreen());
-      case otros:
+      case AppRoutes.otros:
         return MaterialPageRoute(builder: (_) => OtrosScreen());
-      case oxxoKids:
+      case AppRoutes.oxxoKids:
         return MaterialPageRoute(builder: (_) => OxxoKidsScreen());
-      case oxxoAdultos:
+      case AppRoutes.oxxoAdultos:
         return MaterialPageRoute(builder: (_) => OxxoAdultosScreen());
+      case AppRoutes.historial:
+        return MaterialPageRoute(builder: (_) => OtrosScreen());
       default:
-        return MaterialPageRoute(
-            builder: (_) => Scaffold(
-                  body: Center(child: Text('Página no encontrada')),
-                ));
+        return _errorRoute();
     }
+  }
+
+  static Route<dynamic> _errorRoute() {
+    return MaterialPageRoute(
+      builder: (_) => Scaffold(
+        body: Center(
+          child: Text('¡Ruta no encontrada!', style: TextStyle(color: Colors.red)),
+      ),
+      )
+    );
   }
 }

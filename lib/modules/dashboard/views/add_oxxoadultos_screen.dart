@@ -1,5 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker_web/image_picker_web.dart';
+import 'dart:typed_data';
+import 'dart:io'; // Añadir al inicio de add_electronic_screen.dart
 
 class AddOxxoAdultosScreen extends StatefulWidget {
   const AddOxxoAdultosScreen({super.key});
@@ -9,6 +15,7 @@ class AddOxxoAdultosScreen extends StatefulWidget {
 }
 
 class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
+  dynamic _selectedImage;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _cantidad = TextEditingController();
   final TextEditingController _articuloController = TextEditingController();
@@ -23,10 +30,59 @@ class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
   final TextEditingController _reciboInstrucController = TextEditingController();
   final TextEditingController _ubicacionController = TextEditingController();
 
-  Future<void> _addElectronic() async {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _pickImage() async {
+    try {
+      if (kIsWeb) {
+        final Uint8List? bytes = await ImagePickerWeb.getImageAsBytes();
+        if (bytes != null) {
+          setState(() {
+            _selectedImage = bytes;
+          });
+        }
+      } else {
+        if (!kIsWeb){
+          final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+        if (image != null) {
+          setState(() {
+            _selectedImage = XFile(image.path);
+          });
+        }
+        }
+      }
+    } catch (e) {
+      print('Error seleccionando imagen: $e');
+    }
+  }
+
+  Future<String?> _uploadImage(String docId) async {
+    if (_selectedImage == null) return null;
+
+    try {
+      final ref = FirebaseStorage.instance.ref(
+        'oxxoadultos/$docId/${DateTime.now().millisecondsSinceEpoch}'
+      );
+
+      if (kIsWeb) {
+        await ref.putData(_selectedImage as Uint8List);
+      } else {
+        await ref.putFile(_selectedImage as File);
+      }
+
+      return await ref.getDownloadURL();
+    } catch (e) {
+      print('Error subiendo imagen: $e');
+      return null;
+    }
+  }
+
+  Future<void> _addCocina() async {
+    if (!_formKey.currentState!.validate()) return;
+
       try {
-        await FirebaseFirestore.instance.collection('oxxoadultos').doc().set({
+        final docRef = FirebaseFirestore.instance.collection('oxxoadultos').doc();
+        final imageUrl = await _uploadImage(docRef.id);
+
+        await docRef.set({
           'cantidad': _cantidad.text,
           'articulo': _articuloController.text,
           'marca': _marcaController.text,
@@ -39,6 +95,7 @@ class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
           'responsable': _responsableController.text,
           'recibo': _reciboInstrucController.text,
           'ubicacion': _ubicacionController.text,
+          'imagen_url': imageUrl ?? 'N/A',
           'timestamp': FieldValue.serverTimestamp(), // Agregar marca de tiempo
         });
         Navigator.pop(context);
@@ -46,7 +103,6 @@ class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
         );
-      }
     }
   }
 
@@ -63,6 +119,8 @@ class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 15),
+            _buildImagePreview(),
+            const SizedBox(height: 10),
             Form(
               key: _formKey,
               child: Column(
@@ -88,11 +146,10 @@ class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  style: TextButton.styleFrom(foregroundColor: const Color.fromARGB(255, 244, 242, 242)),
                   child: const Text('Cancelar'),
                 ),
                 ElevatedButton(
-                  onPressed: _addElectronic,
+                  onPressed: _addCocina,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
@@ -107,6 +164,41 @@ class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
         ),
         )
       );
+  }
+  Widget _buildImagePreview() {
+    return Column(
+      children: [
+        Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.grey[200],
+            image: _selectedImage != null
+                ? DecorationImage(
+                    image: kIsWeb
+                        ? MemoryImage(_selectedImage as Uint8List)
+                        : FileImage(File((_selectedImage as XFile).path)) as ImageProvider,
+                    fit: BoxFit.cover,
+                  )
+                : null,
+          ),
+          child: _selectedImage == null
+              ? const Icon(Icons.image, size: 40, color: Colors.grey)
+              : null,
+        ),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
+          icon: const Icon(Icons.camera_alt, size: 20),
+          label: const Text('Seleccionar imagen'),
+          onPressed: _pickImage,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.black87,
+            side: const BorderSide(color: Colors.black54),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildTextField(TextEditingController controller, String label, {bool isNumber = false}) {
