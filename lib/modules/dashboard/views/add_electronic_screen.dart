@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,7 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'dart:typed_data';
-import 'dart:io'; // Añadir al inicio de add_electronic_screen.dart
+import 'dart:io';
+
+import 'package:remixicon/remixicon.dart'; // Añadir al inicio de add_electronic_screen.dart
 
 class AddElectronicScreen extends StatefulWidget {
   const AddElectronicScreen({super.key});
@@ -84,7 +87,7 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
       final docRef = FirebaseFirestore.instance.collection('electronicos').doc();
       final imageUrl = await _uploadImage(docRef.id);
 
-      await docRef.set({
+      final nuevoProducto = {
         'cantidad': int.parse(_cantidad.text),
         'articulo': _articuloController.text,
         'marca': _marcaController.text,
@@ -99,15 +102,58 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
         'ubicacion': _ubicacionController.text,
         'imagen_url': imageUrl ?? 'N/A',
         'timestamp': FieldValue.serverTimestamp(),
+      };
+
+      await docRef.set({
+        ...nuevoProducto,
+        'imagen_url' : imageUrl ?? 'N/A',
+        'timestamp' : FieldValue.serverTimestamp(),
       });
 
+      await _registrarEnHistorial(
+        accion: 'Creación',
+        productoId: docRef.id,
+        datos: nuevoProducto,
+        imageUrl: imageUrl,
+      );
+
       Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Producto agreado correctamente'),
+          backgroundColor: Colors.green,
+        ),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
       );
     }
   }
+
+  Future<void> _registrarEnHistorial({
+  required String accion,
+  required String productoId,
+  required Map<String, dynamic> datos,
+  String? imageUrl,
+}) async {
+  await FirebaseFirestore.instance.collection('historial').add({
+    'timestamp': FieldValue.serverTimestamp(),
+    'usuario': FirebaseAuth.instance.currentUser?.email ?? 'Sistema', // Reemplaza con tu sistema de autenticación
+    'categoria': 'Electronicos',
+    'campo': 'Nuevo producto',
+    'tipo_movimiento': accion,
+    'valor_anterior': 'NO EXISTÍA',
+    'valor_nuevo': '''
+      Artículo: ${datos['articulo']}
+      Marca: ${datos['marca']}
+      Modelo: ${datos['modelo']}
+      ID: $productoId
+      Imagen: ${imageUrl != null ? 'SI' : 'NO'}
+    ''',
+    'producto_id': productoId, // Para referencia futura
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -123,40 +169,96 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
             ),
             const SizedBox(height: 15),
             _buildImagePreview(),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             Form(
               key: _formKey,
               child: Column(
                 children: [
-                  _buildTextField(_cantidad, 'Cantidad', isNumber: true),
-                  _buildTextField(_articuloController, 'Artículo'),
-                  _buildTextField(_marcaController, 'Marca'),
-                  _buildTextField(_modeloController, 'Modelo'),
-                  _buildTextField(_especificacionesController, 'Especificaciones'),
-                  _buildTextField(_numeroProductoController, 'N° Producto'),
-                  _buildTextField(_numeroSerieController, 'N° Serie'),
-                  _buildTextField(_antiguedadController, 'Antigüedad'),
-                  _buildTextField(_valorAproxController, 'Valor Aprox.', isNumber: true),
-                  _buildTextField(_responsableController, 'Responsable'),
-                  _buildTextField(_responsabilidadController, 'Responsabilidad'),
-                  _buildTextField(_ubicacionController, 'Ubicación'),
+                  // Fila 1: Cantidad y Artículo
+                  Row(
+                    children: [
+                      Expanded(child: _buildTextField(_cantidad, 'Cantidad', isNumber: true, icon: Remix.archive_stack_line)),
+                      const SizedBox(width: 15),
+                      Expanded(child: _buildTextField(_articuloController, 'Artículo', icon: Remix.shopping_bag_line)),
+                    ],
+                  ),
+                  
+                  // Fila 2: Marca y Modelo
+                  Row(
+                    children: [
+                      Expanded(child: _buildTextField(_marcaController, 'Marca', icon: Remix.trademark_line)),
+                      const SizedBox(width: 15),
+                      Expanded(child: _buildTextField(_modeloController, 'Modelo', icon: Remix.hashtag)),
+                    ],
+                  ),
+                  
+                  // Fila 3: Especificaciones y N° Producto
+                  Row(
+                    children: [
+                      Expanded(child: _buildTextField(_especificacionesController, 'Especificaciones', icon: Remix.file_list_line)),
+                      const SizedBox(width: 15),
+                      Expanded(child: _buildTextField(_numeroProductoController, 'N° Producto', icon: Remix.qr_code_line)),
+                    ],
+                  ),
+                  
+                  // Fila 4: N° Serie y Antigüedad
+                  Row(
+                    children: [
+                      Expanded(child: _buildTextField(_numeroSerieController, 'N° Serie', icon: Remix.barcode_line)),
+                      const SizedBox(width: 15),
+                      Expanded(child: _buildTextField(_antiguedadController, 'Antigüedad', icon: Remix.hourglass_line)),
+                    ],
+                  ),
+                  
+                  // Fila 5: Valor Aprox.
+                  Row(
+                    children: [
+                      Expanded(child: _buildTextField(_valorAproxController, 'Valor Aprox.', isNumber: true, icon: Remix.money_dollar_circle_line)),
+                      const SizedBox(width: 15),
+                      Expanded(child: _buildTextField(_responsableController, 'Responsable', icon: Remix.id_card_line)),
+                    ],
+                  ),
+                  
+                  // Fila 6: Responsable, Responsabilidad y Ubicación
+                  Row(
+                    children: [
+                      Expanded(child: _buildTextField(_responsabilidadController, 'Responsabilidad', icon: Remix.shield_user_line)),
+                      const SizedBox(width: 15),
+                      Expanded(child: _buildTextField(_ubicacionController, 'Ubicación', icon: Remix.map_line)),
+                    ],
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
+            // Botones (sin cambios)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar'),
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        const Color(0xFF971B81), // Color del texto e ícono
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text("Cancelar"),
                 ),
                 ElevatedButton(
                   onPressed: _addElectronic,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: const Color(0xFF009FE3),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: const Text('Guardar'),
                 ),
@@ -208,6 +310,7 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
     TextEditingController controller,
     String label, {
     bool isNumber = false,
+    IconData? icon,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -220,6 +323,7 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
           ),
           filled: true,
           fillColor: Colors.grey[100],
+          prefixIcon: icon != null ? Icon(icon) : null
         ),
         keyboardType: isNumber ? TextInputType.number : TextInputType.text,
         validator: (value) {

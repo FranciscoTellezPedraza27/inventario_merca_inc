@@ -7,10 +7,10 @@ import 'package:inventario_merca_inc/modules/dashboard/views/otros_screen.dart';
 import 'package:inventario_merca_inc/modules/dashboard/views/oxxoadultos_screen.dart';
 import 'package:inventario_merca_inc/modules/dashboard/views/oxxokids_screen.dart';
 import 'package:inventario_merca_inc/modules/dashboard/views/produccion_screen.dart';
+import 'package:inventario_merca_inc/modules/dashboard/views/historial_screen.dart';
 import '../modules/auth/views/login_page.dart';
 import '../modules/dashboard/views/dashboard_screen.dart';
 import '../modules/dashboard/views/electronics_screen.dart';
-import '../modules/dashboard/views/otros_screen.dart';
 import '../modules/dashboard/views/papeleria_screen.dart';
 import '../modules/dashboard/views/sublimacion_screen.dart';
 
@@ -45,7 +45,7 @@ final Map<String, WidgetBuilder> appRoutes = {
   AppRoutes.otros: (context) => OtrosScreen(),
   AppRoutes.oxxoKids: (context) => OxxoKidsScreen(),
   AppRoutes.oxxoAdultos: (context) => OxxoAdultosScreen(),
-  AppRoutes.historial: (context) => OtrosScreen(),
+  AppRoutes.historial: (context) => HistorialScreen(),
 };
 
 class RouteGenerator {
@@ -78,7 +78,7 @@ class RouteGenerator {
       case AppRoutes.oxxoAdultos:
         return MaterialPageRoute(builder: (_) => OxxoAdultosScreen());
       case AppRoutes.historial:
-        return MaterialPageRoute(builder: (_) => OtrosScreen());
+        return MaterialPageRoute(builder: (_) => HistorialScreen());
       default:
         return _errorRoute();
     }

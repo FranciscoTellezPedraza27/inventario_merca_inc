@@ -4,7 +4,7 @@ import 'package:inventario_merca_inc/modules/dashboard/views/add_otros_screen.da
 import 'package:inventario_merca_inc/modules/dashboard/widgets/otros_table.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/search_bar.dart';
-import '../widgets/top_bar.dart';
+import '../widgets/top_bar.dart'; // Asegúrate de importar el TopBar
 
 class OtrosScreen extends StatefulWidget {
   const OtrosScreen({Key? key}) : super(key: key);
@@ -16,7 +16,7 @@ class OtrosScreen extends StatefulWidget {
 class _OtrosScreenState extends State<OtrosScreen> {
   final GlobalKey<OtrosTableState> _otrosTableKey = GlobalKey<OtrosTableState>();
 
- void _navigateToAddProduct(BuildContext context) {
+  void _navigateToAddProduct(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -31,31 +31,40 @@ class _OtrosScreenState extends State<OtrosScreen> {
     );
   }
 
+  Widget _buildActionButtons() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0),
+      child: SearchBarWidget(
+        onAddProduct: () => _navigateToAddProduct(context),
+        pdfConfig: ReportConfig(
+          title: "Reporte de Otros",
+          collection: "otros",
+          headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Recibo / Instructivo", "Ubicación"],
+          fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "recibo", "ubicacion"],
+        ),
+        onSearch: (query) => _otrosTableKey.currentState?.updateSearchQuery(query),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 60,
+        backgroundColor: Colors.white,
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
+        title: TopBar(title: "Otros"), // Aquí usamos el TopBar
       ),
       drawer: const Sidebar(),
       body: Column(
         children: [
-          TopBar(title: "Papelería"),
-          SearchBarWidget(
-            onAddProduct: () => _navigateToAddProduct(context),
-            onSearch: (query) => _otrosTableKey.currentState?.updateSearchQuery(query),
- pdfConfig: ReportConfig(
-    title: "Reporte de Papelería",
-    collection: "papeleria",
-    headers: ["Cantidad", "Material", "Tipo", "Color", "Proveedor"],
-    fields: ["cantidad", "material", "tipo", "color", "proveedor"],
-  ),
-          ),
+          _buildActionButtons(),
           const SizedBox(height: 10),
           Expanded(
             child: Padding(

@@ -37,16 +37,15 @@ class _CocinaScreenState extends State<CocinaScreen> {
     child: SearchBarWidget(
       onAddProduct: () => _navigateToAddProduct(context),
        pdfConfig: ReportConfig(
-    title: "Reporte de Electrónicos",
-    collection: "electronicos",
-    headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad"],
-    fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad"],
+    title: "Reporte de Cocina",
+    collection: "cocina",
+    headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Recibo / Instructivo", "Ubicación"],
+    fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "recibo", "ubicacion"],
   ),
       onSearch: (query) => _cocinaTableKey.currentState?.updateSearchQuery(query),
     ),
   );
 }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

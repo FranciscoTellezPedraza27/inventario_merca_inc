@@ -37,10 +37,10 @@ class _ProduccionScreenState extends State<ProduccionScreen> {
       child: SearchBarWidget(
         onAddProduct: () => _navigateToAddProduct(context),
         pdfConfig: ReportConfig(
-          title: "Reporte de Electrónicos",
-          collection: "Produccionos",
-          headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Responsabilidad", "Ubicación"],
-          fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "responsabilidad", "ubicacion"],
+          title: "Reporte de Producción",
+          collection: "produccion",
+          headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Recibo / Instructivo", "Ubicación"],
+          fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "recibo", "ubicacion"],
         ),
         onSearch: (query) => _produccionTableKey.currentState?.updateSearchQuery(query),
       ),
@@ -59,7 +59,7 @@ class _ProduccionScreenState extends State<ProduccionScreen> {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        title: TopBar(title: "Produccion"), // Aquí usamos el TopBar
+        title: TopBar(title: "Producción"), // Aquí usamos el TopBar
       ),
       drawer: const Sidebar(),
       body: Column(

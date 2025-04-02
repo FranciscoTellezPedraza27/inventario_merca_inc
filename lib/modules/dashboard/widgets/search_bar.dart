@@ -7,11 +7,14 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SearchBarWidget extends StatelessWidget {
+  final bool showAddButton;
+
   final VoidCallback onAddProduct;
   final Function(String) onSearch;
   final ReportConfig pdfConfig;
 
   const SearchBarWidget({
+    this.showAddButton = true,
     super.key,
     required this.onAddProduct,
     required this.onSearch,
@@ -62,19 +65,21 @@ class SearchBarWidget extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildButton(
-                    icon: Icons.add,
-                    label: "Agregar Producto",
-                    color: Colors.black,
-                    onPressed: onAddProduct,
-                  ),
-                  const SizedBox(width: 10),
+  if (showAddButton) ...[
+    _buildButton(
+      icon: Icons.add,
+      label: "Agregar Producto",
+      color: Colors.black,
+      onPressed: onAddProduct,
+    ),
+    const SizedBox(width: 10),
                   _buildButton(
                     icon: Icons.picture_as_pdf,
                     label: "Generar PDF",
                     color: const Color(0xFF009FE3),
                     onPressed: () => _generatePDF(context),
                   ),
+  ],
                 ],
               ),
             ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inventario_merca_inc/modules/auth/controllers/report_config.dart';
 import 'package:inventario_merca_inc/modules/dashboard/views/add_sublimacion_screen.dart';
+import 'package:inventario_merca_inc/modules/dashboard/widgets/top_bar.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/sublimacion_table.dart';
@@ -37,53 +38,43 @@ class _SublimacionScreenState extends State<SublimacionScreen> {
     child: SearchBarWidget(
       onAddProduct: () => _navigateToAddProduct(context),
        pdfConfig: ReportConfig(
-    title: "Reporte de Electrónicos",
-    collection: "electronicos",
-    headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Responsabilidad", "Ubicación"],
-    fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "responsabilidad", "ubicacion"],
+    title: "Reporte de Sublimación",
+    collection: "sublimacion",
+    headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Recibo / Instructivo", "Ubicación"],
+    fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "recibo", "ubicacion"],
   ),
       onSearch: (query) => _sublimacionTableKey.currentState?.updateSearchQuery(query),
     ),
   );
 }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
-  appBar: AppBar(
-    toolbarHeight: 60, // Altura del AppBar
-    backgroundColor: Colors.white, // Color de fondo
-    title: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20), // Padding horizontal
-      child: const Text("Sublimación"),
-    ),
-    leading: Builder(
-      builder: (context) => IconButton(
-        icon: const Icon(Icons.menu),
-        onPressed: () => Scaffold.of(context).openDrawer(),
-      ),
-    ),
-    flexibleSpace: Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade300)
+      appBar: AppBar(
+        toolbarHeight: 60,
+        backgroundColor: Colors.white,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
         ),
+        title: TopBar(title: "Sublimación"), // Aquí usamos el TopBar
       ),
-    ),
-  ),
-  drawer: const Sidebar(),
-  body: Column(
-    children: [
-      _buildActionButtons(),
-      const SizedBox(height: 10),
-      Expanded(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: SublimacionTable(key: _sublimacionTableKey),
-        ),
+      drawer: const Sidebar(),
+      body: Column(
+        children: [
+          _buildActionButtons(),
+          const SizedBox(height: 10),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SublimacionTable(key: _sublimacionTableKey),
+            ),
+          ),
+        ],
       ),
-    ],
-  ),
-);
+    );
   }
 }

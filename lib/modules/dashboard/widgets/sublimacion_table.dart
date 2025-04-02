@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:inventario_merca_inc/modules/dashboard/actions/delete_sublimacion.dart';
+import 'package:inventario_merca_inc/modules/dashboard/actions/edit_sublimacion.dart';
+import 'package:inventario_merca_inc/modules/dashboard/actions/view_products.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -14,7 +17,7 @@ class SublimacionTableState extends State<SublimacionTable> {
   String _searchQuery = "";
   final ScrollController _horizontalScrollController = ScrollController();
   final ScrollController _verticalScrollController = ScrollController();
-  final double _actionsColumnWidth = 150;
+  final double _actionsColumnWidth = 190.0;
   final ScrollController _dummyHorizontalController = ScrollController();
 
   @override
@@ -198,21 +201,19 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
 
 DataColumn _buildHeader(String text) {
   return DataColumn(
-    label: SizedBox(
-      width: 140,
-      child: Padding(
-        padding: const EdgeInsetsDirectional.symmetric(vertical: 12, horizontal: 4),
+    label: Expanded( // Permite que la columna se ajuste dinámicamente
+      child: Center(
         child: Text(
           text,
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14,
-            color: Colors.black87
+            color: Colors.black87,
           ),
         ),
       ),
-    )
+    ),
   );
 }
 
@@ -269,16 +270,34 @@ Widget _buildActionsColumn(List<QueryDocumentSnapshot> filteredData) {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
+                      icon: Icon(Remix.eye_line, color: Color(0xFF009FE3)),
+                      onPressed: () {
+                        showDialog(
+                          context: context, 
+                          builder: (context) => ViewProductsScreen(document: filteredData[index])
+                        );
+                      },
+                    ),
+                    IconButton(
                       icon: Icon(Remix.add_large_line, color: Colors.green),
                       onPressed: () {},
                     ),
                     IconButton(
                       icon: Icon(Remix.edit_box_line, color: Color(0xFFF6A000)),
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          context: context, 
+                          builder: (context) => EditSublimacionScreen(document: filteredData[index]));
+                      },
                     ),
                     IconButton(
                       icon: Icon(Remix.delete_bin_line, color: Color(0xFF971B81)),
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => DeleteSublimacionScreen(document: filteredData[index])
+                        );
+                      },
                     ),
                   ],
                 ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:inventario_merca_inc/modules/dashboard/actions/delete_electronics.dart';
+import 'package:inventario_merca_inc/modules/dashboard/actions/edit_electronics.dart';
+import 'package:inventario_merca_inc/modules/dashboard/actions/view_electronics.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -14,7 +17,7 @@ class ElectronicTableState extends State<ElectronicTable> {
   String _searchQuery = "";
   final ScrollController _horizontalScrollController = ScrollController();
   final ScrollController _verticalScrollController = ScrollController();
-  final double _actionsColumnWidth = 150.0;
+  final double _actionsColumnWidth = 190.0;
   final ScrollController _dummyHorizontalController = ScrollController();
 
   @override
@@ -199,25 +202,22 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
   // Método para construir encabezados uniformes
   DataColumn _buildHeader(String text) {
   return DataColumn(
-    label: SizedBox(
-      width: 140, // Asegura un ancho suficiente
-      child: Center( // Centra el contenido dentro del SizedBox
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: Colors.black87,
-            ),
+    label: Expanded( // Permite que la columna se ajuste dinámicamente
+      child: Center(
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.black87,
           ),
         ),
       ),
     ),
   );
 }
+
 
 
   Widget _buildMainDataTable(List<QueryDocumentSnapshot> filteredData) {
@@ -246,7 +246,7 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
 
   Widget _buildActionsColumn(List<QueryDocumentSnapshot> filteredData) {
     return DataTable(
-      columnSpacing: 0,
+      columnSpacing: 90,
       headingRowHeight: 60,
       dataRowHeight: 80,
       columns: const [
@@ -271,18 +271,38 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: Icon(Remix.add_large_line, color: Colors.green),
-                      onPressed: () {},
+                      icon: Icon(Remix.eye_line, color: Color(0xFF009FE3)),
+                      onPressed: () {
+                        showDialog(
+                          context: context, 
+                          builder: (context) => ViewElectronicsScreen(document: filteredData[index])
+                        );
+                      },
                     ),
+                    /*IconButton(
+                      icon: Icon(Remix.add_large_line, color: Color(0xFF4CAF50)),
+                      onPressed: () {},
+                    ),*/
                     IconButton(
                       icon: Icon(Remix.edit_box_line, color: Color(0xFFF6A000)),
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => EditElectronicsScreen(document: filteredData[index])
+                        );
+                      },
                     ),
                     IconButton(
                       icon: Icon(Remix.delete_bin_line, color: Color(0xFF971B81)),
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => DeleteElectronicsScreen(document: filteredData[index])
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -305,8 +325,8 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
 
   DataRow _buildDataRow(QueryDocumentSnapshot document) {
     final data = document.data() as Map<String, dynamic>;
-    final imageUrl = data['imagen_url']?.toString();
-    
+    final String? imageUrl = data['imagen_url'] as String?; // ← Acepta null
+
     return DataRow(
       cells: [
         _buildDataCell('${data['cantidad'] ?? 0}'),
@@ -317,7 +337,8 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
         _buildDataCell(data['numero_producto']?.toString()),
         _buildDataCell(data['numero_serie']?.toString()),
         _buildDataCell(data['antiguedad']?.toString()),
-        _buildDataCell("\$${double.tryParse(data['valor_aprox']?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'}"),
+        _buildDataCell(
+            "\$${double.tryParse(data['valor_aprox']?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'}"),
         _buildDataCell(data['responsable']?.toString()),
         _buildDataCell(data['responsabilidad']?.toString()),
         _buildDataCell(data['ubicacion']?.toString()),
@@ -325,15 +346,27 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Center(
-              child: imageUrl != null && imageUrl != 'N/A' 
-                ? CachedNetworkImage(
-                    imageUrl: imageUrl,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => const Icon(Icons.error))
-                : const Text('N/A')
+              child: (imageUrl != null &&
+                      imageUrl.isNotEmpty &&
+                      imageUrl != 'N/A') // ← Null check
+                  ? CachedNetworkImage(
+                      imageUrl:
+                          imageUrl!, // ← Usa "!" porque ya verificamos que no es null
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                    )
+                  : const Text(
+                      'N/A',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
             ),
           ),
         ),

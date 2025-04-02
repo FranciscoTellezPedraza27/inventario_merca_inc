@@ -17,14 +17,29 @@ class Sidebar extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancelar"),
+              child: const Text("Cancelar", style: TextStyle(color: Colors.white)),
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFF009FE3),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16, vertical: 12
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)
+                )
+              ),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
                 _signOut(context);
               },
-              child: const Text("Cerrar sesión", style: TextStyle(color: Colors.red)),
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFF971B81),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
+              ),
+              child: const Text("Cerrar sesión", style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -180,7 +195,7 @@ class Sidebar extends StatelessWidget {
     decoration: BoxDecoration(
       color: isSelected ? const Color(0xFF7A1667) : Colors.transparent,
       borderRadius: BorderRadius.circular(8),
-    ), // <-- Este paréntesis estaba mal ubicado
+    ),
     margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     child: ListTile(
       leading: Icon(icon, color: Colors.white.withOpacity(isSelected ? 1 : 0.8)),

@@ -37,10 +37,10 @@ class _LimpiezaScreenState extends State<LimpiezaScreen> {
       child: SearchBarWidget(
         onAddProduct: () => _navigateToAddProduct(context),
         pdfConfig: ReportConfig(
-          title: "Reporte de Electrónicos",
-          collection: "Limpiezaos",
-          headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Responsabilidad", "Ubicación"],
-          fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "responsabilidad", "ubicacion"],
+          title: "Reporte de Limpieza",
+          collection: "limpieza",
+          headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Recibo / Instructivo", "Ubicación"],
+          fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "recibo", "ubicacion"],
         ),
         onSearch: (query) => _limpiezaTableKey.currentState?.updateSearchQuery(query),
       ),

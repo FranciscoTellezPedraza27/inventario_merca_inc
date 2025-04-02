@@ -37,10 +37,10 @@ class _OxxoKidsScreenState extends State<OxxoKidsScreen> {
       child: SearchBarWidget(
         onAddProduct: () => _navigateToAddProduct(context),
         pdfConfig: ReportConfig(
-          title: "Reporte de Electrónicos",
-          collection: "OxxoKidsos",
-          headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Responsabilidad", "Ubicación"],
-          fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "responsabilidad", "ubicacion"],
+          title: "Reporte de OXXO Kids",
+          collection: "oxxokids",
+          headers: ["Cantidad", "Artículo", "Marca", "Modelo", "Especificaciones", "N° Producto", "N° Serie", "Antigüedad", "Valor Aproximado", "Responsable", "Recibo / Instructivo", "Ubicación"],
+          fields: ["cantidad", "articulo", "marca", "modelo", "especificaciones", "numero_producto", "numero_serie", "antiguedad", "valor_aprox", "responsable", "recibo", "ubicacion"],
         ),
         onSearch: (query) => _oxxoKidsTableKey.currentState?.updateSearchQuery(query),
       ),
@@ -59,7 +59,7 @@ class _OxxoKidsScreenState extends State<OxxoKidsScreen> {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        title: TopBar(title: "OxxoKids"), // Aquí usamos el TopBar
+        title: TopBar(title: "OXXO Kids"), // Aquí usamos el TopBar
       ),
       drawer: const Sidebar(),
       body: Column(
