@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inventario_merca_inc/modules/dashboard/actions/delete_cocina.dart';
 import 'package:inventario_merca_inc/modules/dashboard/actions/edit_cocina.dart';
+import 'package:inventario_merca_inc/modules/dashboard/actions/stock_action.dart';
 import 'package:inventario_merca_inc/modules/dashboard/actions/view_products.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -278,10 +279,19 @@ Widget _buildActionsColumn(List<QueryDocumentSnapshot> filteredData) {
                         );
                       },
                     ),
-                    IconButton(
-                      icon: Icon(Remix.add_large_line, color: Colors.green),
-                      onPressed: () {},
-                    ),
+                    /*IconButton(
+                      icon: Icon(Remix.arrow_up_down_line, color: Colors.green),
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) => EditStockScreen(
+                                document:
+                                    filteredData[index], // Documento correcto
+                                collectionName: 'cocina',
+                                fieldName: 'cantidad' // Parámetro bien escrito
+                                ));
+                      },
+                    ),*/
                     IconButton(
                       icon: Icon(Remix.edit_box_line, color: Color(0xFFF6A000)),
                       onPressed: () {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inventario_merca_inc/modules/dashboard/actions/delete_electronics.dart';
 import 'package:inventario_merca_inc/modules/dashboard/actions/edit_electronics.dart';
+import 'package:inventario_merca_inc/modules/dashboard/actions/stock_action.dart';
 import 'package:inventario_merca_inc/modules/dashboard/actions/view_electronics.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -283,8 +284,12 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
                       },
                     ),
                     /*IconButton(
-                      icon: Icon(Remix.add_large_line, color: Color(0xFF4CAF50)),
-                      onPressed: () {},
+                      icon: Icon(Remix.arrow_up_down_line, color: Color(0xFF4CAF50)),
+                      onPressed: () {
+                        showDialog(
+                          context: context, 
+                          builder: (context) => EditStockScreen(document: filteredData[index]));
+                      },
                     ),*/
                     IconButton(
                       icon: Icon(Remix.edit_box_line, color: Color(0xFFF6A000)),
@@ -325,6 +330,10 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
 
   DataRow _buildDataRow(QueryDocumentSnapshot document) {
     final data = document.data() as Map<String, dynamic>;
+      // Asegúrate de manejar el tipo
+  final cantidad = data['cantidad'] is int 
+      ? data['cantidad'] 
+      : int.tryParse(data['cantidad']?.toString() ?? '0') ?? 0;
     final String? imageUrl = data['imagen_url'] as String?; // ← Acepta null
 
     return DataRow(

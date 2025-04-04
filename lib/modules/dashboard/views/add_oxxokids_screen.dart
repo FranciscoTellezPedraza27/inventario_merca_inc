@@ -18,6 +18,9 @@ class AddOxxoKidsScreen extends StatefulWidget {
 }
 
 class _AddOxxoKidsScreenState extends State<AddOxxoKidsScreen> {
+  bool _stockMinimoHabilitado = false;
+  final TextEditingController _stockMinimoController = TextEditingController();
+
   dynamic _selectedImage; // Uint8List para web, File para móvil
   final _formKey = GlobalKey<FormState>();
   
@@ -80,14 +83,14 @@ class _AddOxxoKidsScreenState extends State<AddOxxoKidsScreen> {
     }
   }
 
-  Future<void> _addElectronic() async {
+  Future<void> _addOxxoKids() async {
     if (!_formKey.currentState!.validate()) return;
 
     try {
       final docRef = FirebaseFirestore.instance.collection('oxxokids').doc();
       final imageUrl = await _uploadImage(docRef.id);
 
-      final nuevaPeleria = {
+      final nuevoOxxoKids = {
         'cantidad': int.parse(_cantidad.text),
         'articulo': _articuloController.text,
         'marca': _marcaController.text,
@@ -102,10 +105,11 @@ class _AddOxxoKidsScreenState extends State<AddOxxoKidsScreen> {
         'ubicacion': _ubicacionController.text,
         'imagen_url': imageUrl ?? 'N/A',
         'timestamp': FieldValue.serverTimestamp(),
+        'stock_minimo': _stockMinimoHabilitado ? int.parse(_stockMinimoController.text): null,
       };
 
       await docRef.set({
-        ...nuevaPeleria,
+        ...nuevoOxxoKids,
         'imagen_url' : imageUrl ?? 'N/A',
         'timestamp' : FieldValue.serverTimestamp(),
       });
@@ -113,7 +117,7 @@ class _AddOxxoKidsScreenState extends State<AddOxxoKidsScreen> {
       await _registrarEnHistorial(
         accion: 'Creación',
         productoId: docRef.id,
-        datos: nuevaPeleria,
+        datos: nuevoOxxoKids,
         imageUrl: imageUrl,
       );
 
@@ -216,6 +220,35 @@ Widget build(BuildContext context) {
                     Expanded(child: _buildTextField(_ubicacionController, 'Ubicación', icon: Remix.map_line)),
                   ],
                 ),
+                Row(
+  children: [
+    Expanded(
+      child: Row(
+        children: [
+          Checkbox(
+            value: _stockMinimoHabilitado,
+            onChanged: (bool? value) {
+              setState(() {
+                _stockMinimoHabilitado = value ?? false;
+              });
+            },
+          ),
+          const Text('¿Stock mínimo?'),
+          const SizedBox(width: 15),
+          Expanded(
+            child: _buildTextField(
+              _stockMinimoController,
+              'Número de stock mínimo',
+              isNumber: true,
+              icon: Remix.alarm_warning_line,
+              enabled: _stockMinimoHabilitado,
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+),
               ],
             ),
           ),
@@ -228,7 +261,7 @@ Widget build(BuildContext context) {
                 child: const Text('Cancelar'),
               ),
               ElevatedButton(
-                onPressed: _addElectronic,
+                onPressed: _addOxxoKids,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   foregroundColor: Colors.white,
@@ -286,11 +319,13 @@ Widget build(BuildContext context) {
     String label, {
     bool isNumber = false,
     IconData? icon,
+    bool enabled =  true,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
         controller: controller,
+        enabled: enabled,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(

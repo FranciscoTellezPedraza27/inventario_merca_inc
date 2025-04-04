@@ -279,10 +279,10 @@ Widget _buildActionsColumn(List<QueryDocumentSnapshot> filteredData) {
                         );
                       },
                     ),
-                    IconButton(
+                    /*IconButton(
                       icon: Icon(Remix.add_large_line, color: Colors.green),
                       onPressed: () {},
-                    ),
+                    ),*/
                     IconButton(
                       icon: Icon(Remix.edit_box_line, color: Color(0xFFF6A000)),
                       onPressed: () {
