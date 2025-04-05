@@ -18,6 +18,7 @@ class AddOxxoAdultosScreen extends StatefulWidget {
 }
 
 class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
+  bool _stockMinimoHabilitado = false;
   dynamic _selectedImage; // Uint8List para web, File para móvil
   final _formKey = GlobalKey<FormState>();
   
@@ -34,6 +35,7 @@ class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
   final TextEditingController _responsableController = TextEditingController();
   final TextEditingController _reicboController = TextEditingController();
   final TextEditingController _ubicacionController = TextEditingController();
+  final TextEditingController _stockMinimoController = TextEditingController();
 
   Future<void> _pickImage() async {
     try {
@@ -80,15 +82,18 @@ class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
     }
   }
 
-  Future<void> _addElectronic() async {
+  Future<void> _addOxxoAdultos() async {
     if (!_formKey.currentState!.validate()) return;
 
     try {
       final docRef = FirebaseFirestore.instance.collection('oxxoadultos').doc();
       final imageUrl = await _uploadImage(docRef.id);
 
-      final nuevaPeleria = {
-        'cantidad': int.parse(_cantidad.text),
+      final cantidad = int.parse(_cantidad.text);
+      final StockMinimo = _stockMinimoHabilitado ? int.parse(_stockMinimoController.text) : null;
+
+      final nuevoOxxoA = {
+        'cantidad': cantidad,
         'articulo': _articuloController.text,
         'marca': _marcaController.text,
         'modelo': _modeloController.text,
@@ -102,18 +107,29 @@ class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
         'ubicacion': _ubicacionController.text,
         'imagen_url': imageUrl ?? 'N/A',
         'timestamp': FieldValue.serverTimestamp(),
+        'stock_minimo' : StockMinimo,
       };
 
       await docRef.set({
-        ...nuevaPeleria,
+        ...nuevoOxxoA,
         'imagen_url' : imageUrl ?? 'N/A',
         'timestamp' : FieldValue.serverTimestamp(),
       });
 
+      // Crear notificación si aplica
+    if (StockMinimo != null && cantidad <= StockMinimo) {
+      await _crearNotificacionStockBajo(
+        productoId: docRef.id,
+        nombreProducto: _articuloController.text,
+        stockActual: cantidad,
+        stockMinimo: StockMinimo,
+      );
+    }
+
       await _registrarEnHistorial(
         accion: 'Creación',
         productoId: docRef.id,
-        datos: nuevaPeleria,
+        datos: nuevoOxxoA,
         imageUrl: imageUrl,
       );
 
@@ -216,6 +232,35 @@ Widget build(BuildContext context) {
                     Expanded(child: _buildTextField(_ubicacionController, 'Ubicación', icon: Remix.map_line)),
                   ],
                 ),
+                Row(
+  children: [
+    Expanded(
+      child: Row(
+        children: [
+          Checkbox(
+            value: _stockMinimoHabilitado,
+            onChanged: (bool? value) {
+              setState(() {
+                _stockMinimoHabilitado = value ?? false;
+              });
+            },
+          ),
+          const Text('¿Stock mínimo?'),
+          const SizedBox(width: 15),
+          Expanded(
+            child: _buildTextField(
+              _stockMinimoController,
+              'Número de stock mínimo',
+              isNumber: true,
+              icon: Remix.alarm_warning_line,
+              enabled: _stockMinimoHabilitado,
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+),
               ],
             ),
           ),
@@ -228,7 +273,7 @@ Widget build(BuildContext context) {
                 child: const Text('Cancelar'),
               ),
               ElevatedButton(
-                onPressed: _addElectronic,
+                onPressed: _addOxxoAdultos,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   foregroundColor: Colors.white,
@@ -286,11 +331,13 @@ Widget build(BuildContext context) {
     String label, {
     bool isNumber = false,
     IconData? icon,
+    bool enabled = true,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
         controller: controller,
+        enabled: enabled,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(
@@ -309,4 +356,25 @@ Widget build(BuildContext context) {
       ),
     );
   }
+
+  Future<void> _crearNotificacionStockBajo({
+  required String productoId,
+  required String nombreProducto,
+  required int stockActual,
+  required int stockMinimo,
+}) async {
+  try {
+    await FirebaseFirestore.instance.collection('notificaciones').add({
+      'titulo': '⚠️ Stock bajo en OXXO Adultos',
+      'mensaje': 'El producto "$nombreProducto" tiene stock bajo ($stockActual unidades). Stock mínimo: $stockMinimo',
+      'documentoId': productoId,
+      'leida': false,
+      'fecha': FieldValue.serverTimestamp(),
+      'tipo': 'stock_bajo',
+      'categoria': 'oxxoadultos', // Cambiamos la categoría
+    });
+  } catch (e) {
+    print('Error al crear notificación de stock bajo: $e');
+  }
+}
 }
