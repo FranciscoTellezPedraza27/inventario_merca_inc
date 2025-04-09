@@ -19,8 +19,6 @@ class AddOxxoKidsScreen extends StatefulWidget {
 
 class _AddOxxoKidsScreenState extends State<AddOxxoKidsScreen> {
   bool _stockMinimoHabilitado = false;
-  final TextEditingController _stockMinimoController = TextEditingController();
-
   dynamic _selectedImage; // Uint8List para web, File para móvil
   final _formKey = GlobalKey<FormState>();
   
@@ -37,6 +35,7 @@ class _AddOxxoKidsScreenState extends State<AddOxxoKidsScreen> {
   final TextEditingController _responsableController = TextEditingController();
   final TextEditingController _reicboController = TextEditingController();
   final TextEditingController _ubicacionController = TextEditingController();
+  final TextEditingController _stockMinimoController = TextEditingController();
 
   Future<void> _pickImage() async {
     try {
@@ -90,8 +89,11 @@ class _AddOxxoKidsScreenState extends State<AddOxxoKidsScreen> {
       final docRef = FirebaseFirestore.instance.collection('oxxokids').doc();
       final imageUrl = await _uploadImage(docRef.id);
 
+      final cantidad = int.parse(_cantidad.text);
+      final StockMinimo = _stockMinimoHabilitado ? int.parse(_stockMinimoController.text) : null;
+
       final nuevoOxxoKids = {
-        'cantidad': int.parse(_cantidad.text),
+        'cantidad': cantidad,
         'articulo': _articuloController.text,
         'marca': _marcaController.text,
         'modelo': _modeloController.text,
@@ -105,7 +107,7 @@ class _AddOxxoKidsScreenState extends State<AddOxxoKidsScreen> {
         'ubicacion': _ubicacionController.text,
         'imagen_url': imageUrl ?? 'N/A',
         'timestamp': FieldValue.serverTimestamp(),
-        'stock_minimo': _stockMinimoHabilitado ? int.parse(_stockMinimoController.text): null,
+        'stock_minimo': StockMinimo,
       };
 
       await docRef.set({
@@ -113,6 +115,16 @@ class _AddOxxoKidsScreenState extends State<AddOxxoKidsScreen> {
         'imagen_url' : imageUrl ?? 'N/A',
         'timestamp' : FieldValue.serverTimestamp(),
       });
+
+       // Crear notificación si aplica
+    if (StockMinimo != null && cantidad <= StockMinimo) {
+      await _crearNotificacionStockBajo(
+        productoId: docRef.id,
+        nombreProducto: _articuloController.text,
+        stockActual: cantidad,
+        stockMinimo: StockMinimo,
+      );
+    }
 
       await _registrarEnHistorial(
         accion: 'Creación',
@@ -169,7 +181,7 @@ Widget build(BuildContext context) {
         children: [
           const Text(
             'Agregar al Inventario',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Poppins',),
           ),
           const SizedBox(height: 15),
           _buildImagePreview(),
@@ -256,20 +268,34 @@ Widget build(BuildContext context) {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
-              ),
-              ElevatedButton(
-                onPressed: _addOxxoKids,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        const Color(0xFF971B81), // Color del texto e ícono
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text("Cancelar"),
                 ),
-                child: const Text('Guardar'),
-              ),
-            ],
+                ElevatedButton(
+                  onPressed: _addOxxoKids,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF009FE3),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text('Guardar'),
+                ),
+              ],
           ),
         ],
       ),
@@ -344,4 +370,27 @@ Widget build(BuildContext context) {
       ),
     );
   }
+
+  // Función _crearNotificacionStockBajo corregida
+Future<void> _crearNotificacionStockBajo({
+  required String productoId,
+  required String nombreProducto,
+  required int stockActual,
+  required int stockMinimo,
+}) async {
+  try {
+    await FirebaseFirestore.instance.collection('notificaciones').add({
+      'titulo': '⚠️ Stock bajo en OXXO Kids',
+      'mensaje': 'El producto "$nombreProducto" tiene stock bajo ($stockActual unidades).',
+      'detalle_extra': 'Stock mínimo: $stockMinimo', // <-- Corrección aquí
+      'documentoId': productoId,
+      'leida': false,
+      'fecha': FieldValue.serverTimestamp(),
+      'tipo': 'stock_bajo',
+      'categoria': 'oxxokids',
+    });
+  } catch (e) {
+    print('Error al crear notificación: $e');
+  }
+}
 }

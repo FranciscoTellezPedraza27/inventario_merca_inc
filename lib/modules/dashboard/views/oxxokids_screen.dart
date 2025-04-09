@@ -67,10 +67,7 @@ class _OxxoKidsScreenState extends State<OxxoKidsScreen> {
           _buildActionButtons(),
           const SizedBox(height: 10),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: OxxoKidsTable(key: _oxxoKidsTableKey),
-            ),
           ),
         ],
       ),

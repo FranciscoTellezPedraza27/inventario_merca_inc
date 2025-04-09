@@ -181,7 +181,7 @@ Widget build(BuildContext context) {
         children: [
           const Text(
             'Agregar al Inventario',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Poppins',),
           ),
           const SizedBox(height: 15),
           _buildImagePreview(),
@@ -268,20 +268,34 @@ Widget build(BuildContext context) {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
-              ),
-              ElevatedButton(
-                onPressed: _addOxxoAdultos,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        const Color(0xFF971B81), // Color del texto e ícono
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text("Cancelar"),
                 ),
-                child: const Text('Guardar'),
-              ),
-            ],
+                ElevatedButton(
+                  onPressed: _addOxxoAdultos,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF009FE3),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text('Guardar'),
+                ),
+              ],
           ),
         ],
       ),
@@ -357,7 +371,8 @@ Widget build(BuildContext context) {
     );
   }
 
-  Future<void> _crearNotificacionStockBajo({
+  // Función _crearNotificacionStockBajo corregida
+Future<void> _crearNotificacionStockBajo({
   required String productoId,
   required String nombreProducto,
   required int stockActual,
@@ -366,15 +381,16 @@ Widget build(BuildContext context) {
   try {
     await FirebaseFirestore.instance.collection('notificaciones').add({
       'titulo': '⚠️ Stock bajo en OXXO Adultos',
-      'mensaje': 'El producto "$nombreProducto" tiene stock bajo ($stockActual unidades). Stock mínimo: $stockMinimo',
+      'mensaje': 'El producto "$nombreProducto" tiene stock bajo ($stockActual unidades).',
+      'detalle_extra': 'Stock mínimo: $stockMinimo', // <-- Corrección aquí
       'documentoId': productoId,
       'leida': false,
       'fecha': FieldValue.serverTimestamp(),
       'tipo': 'stock_bajo',
-      'categoria': 'oxxoadultos', // Cambiamos la categoría
+      'categoria': 'oxxoadultos',
     });
   } catch (e) {
-    print('Error al crear notificación de stock bajo: $e');
+    print('Error al crear notificación: $e');
   }
 }
 }

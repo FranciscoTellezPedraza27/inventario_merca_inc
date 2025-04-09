@@ -66,6 +66,7 @@ class DeleteSublimacionScreen extends StatelessWidget {
                 Text(
                   '¿Eliminar registro permanentemente?',
                   style: TextStyle(
+                    fontFamily: 'Poppins',
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.grey[800],
@@ -76,6 +77,7 @@ class DeleteSublimacionScreen extends StatelessWidget {
                 Text(
                   'Esta acción no se puede deshacer',
                   style: TextStyle(
+                    fontFamily: 'Poppins',
                     color: Colors.grey[600],
                     fontStyle: FontStyle.italic,
                   ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inventario_merca_inc/modules/dashboard/actions/delete_electronics.dart';
 import 'package:inventario_merca_inc/modules/dashboard/actions/edit_electronics.dart';
-import 'package:inventario_merca_inc/modules/dashboard/actions/stock_action.dart';
 import 'package:inventario_merca_inc/modules/dashboard/actions/view_electronics.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -76,8 +75,7 @@ Widget build(BuildContext context) {
   // Remover esta línea: final ScrollController _dummyHorizontalController = ScrollController();
   final totalColumnsWidth = (140.0 * 12) + 190.0 + (30.0 * 12);
 
-  return Expanded(
-    child: Container(
+    return Container(
       margin: const EdgeInsets.all(6.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -166,7 +164,6 @@ Widget build(BuildContext context) {
           }
         )
       )
-    )
   );  
 }
 
@@ -209,6 +206,7 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
           text,
           textAlign: TextAlign.center,
           style: const TextStyle(
+            fontFamily: 'Poppins',
             fontWeight: FontWeight.bold,
             fontSize: 14,
             color: Colors.black87,
@@ -256,6 +254,7 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
             child: Text(
               "Acciones",
               style: TextStyle(
+                fontFamily: 'Poppins',
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
                 color: Colors.black87,
@@ -331,9 +330,6 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
   DataRow _buildDataRow(QueryDocumentSnapshot document) {
     final data = document.data() as Map<String, dynamic>;
       // Asegúrate de manejar el tipo
-  final cantidad = data['cantidad'] is int 
-      ? data['cantidad'] 
-      : int.tryParse(data['cantidad']?.toString() ?? '0') ?? 0;
     final String? imageUrl = data['imagen_url'] as String?; // ← Acepta null
 
     return DataRow(
@@ -360,7 +356,7 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
                       imageUrl != 'N/A') // ← Null check
                   ? CachedNetworkImage(
                       imageUrl:
-                          imageUrl!, // ← Usa "!" porque ya verificamos que no es null
+                          imageUrl, // ← Usa "!" porque ya verificamos que no es null
                       width: 60,
                       height: 60,
                       fit: BoxFit.cover,
@@ -372,6 +368,7 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
                   : const Text(
                       'N/A',
                       style: TextStyle(
+                        fontFamily: 'Poppins',
                         color: Colors.grey,
                         fontStyle: FontStyle.italic,
                       ),
@@ -396,6 +393,7 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
               overflow: TextOverflow.ellipsis,
               maxLines: isWide ? 3 : 2,
               style: const TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 13,
                 color: Colors.black87,
               ),
@@ -418,7 +416,7 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
       padding: const EdgeInsets.all(20.0),
       child: Text(
         'Error: $error',
-        style: const TextStyle(color: Colors.red),
+        style: const TextStyle(color: Colors.red, fontFamily: 'Poppins',),
       ),
     ),
   );
@@ -428,7 +426,7 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
       padding: const EdgeInsets.all(20.0),
       child: Text(
         'No hay datos disponibles',
-        style: TextStyle(color: Colors.grey),
+        style: TextStyle(color: Colors.grey, fontFamily: 'Poppins',),
       ),
     ),
   );

@@ -67,10 +67,7 @@ class _ElectronicsScreenState extends State<ElectronicsScreen> {
           _buildActionButtons(),
           const SizedBox(height: 10),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: ElectronicTable(key: _electronicTableKey),
-            ),
           ),
         ],
       ),

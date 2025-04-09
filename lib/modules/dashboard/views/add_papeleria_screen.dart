@@ -18,6 +18,7 @@ class AddPapeleriaScreen extends StatefulWidget {
 }
 
 class _AddPapeleriaScreenState extends State<AddPapeleriaScreen> {
+  bool _stockMinimoHabilitado = false;
   dynamic _selectedImage; // Uint8List para web, File para móvil
   final _formKey = GlobalKey<FormState>();
   
@@ -34,6 +35,7 @@ class _AddPapeleriaScreenState extends State<AddPapeleriaScreen> {
   final TextEditingController _responsableController = TextEditingController();
   final TextEditingController _reicboController = TextEditingController();
   final TextEditingController _ubicacionController = TextEditingController();
+  final TextEditingController _stockMinimoController = TextEditingController();
 
   Future<void> _pickImage() async {
     try {
@@ -80,12 +82,15 @@ class _AddPapeleriaScreenState extends State<AddPapeleriaScreen> {
     }
   }
 
-  Future<void> _addElectronic() async {
+  Future<void> _addPapeleria() async {
     if (!_formKey.currentState!.validate()) return;
 
     try {
       final docRef = FirebaseFirestore.instance.collection('papeleria').doc();
       final imageUrl = await _uploadImage(docRef.id);
+
+      final cantidad = int.parse(_cantidad.text);
+      final StockMinimo = _stockMinimoHabilitado ? int.parse(_stockMinimoController.text) : null;
 
       final nuevaPeleria = {
         'cantidad': int.parse(_cantidad.text),
@@ -102,6 +107,7 @@ class _AddPapeleriaScreenState extends State<AddPapeleriaScreen> {
         'ubicacion': _ubicacionController.text,
         'imagen_url': imageUrl ?? 'N/A',
         'timestamp': FieldValue.serverTimestamp(),
+        'stock_minimo' : StockMinimo,
       };
 
       await docRef.set({
@@ -109,6 +115,17 @@ class _AddPapeleriaScreenState extends State<AddPapeleriaScreen> {
         'imagen_url' : imageUrl ?? 'N/A',
         'timestamp' : FieldValue.serverTimestamp(),
       });
+
+      // Crear notificación si aplica
+    if (StockMinimo != null && cantidad <= StockMinimo) {
+      await _crearNotificacionStockBajo(
+        productoId: docRef.id,
+        nombreProducto: _articuloController.text,
+        stockActual: cantidad,
+        stockMinimo: StockMinimo,
+      );
+    }
+
 
       await _registrarEnHistorial(
         accion: 'Creación',
@@ -165,7 +182,7 @@ Widget build(BuildContext context) {
         children: [
           const Text(
             'Agregar al Inventario',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Poppins',),
           ),
           const SizedBox(height: 15),
           _buildImagePreview(),
@@ -216,6 +233,35 @@ Widget build(BuildContext context) {
                     Expanded(child: _buildTextField(_ubicacionController, 'Ubicación', icon: Remix.map_line)),
                   ],
                 ),
+                Row(
+  children: [
+    Expanded(
+      child: Row(
+        children: [
+          Checkbox(
+            value: _stockMinimoHabilitado,
+            onChanged: (bool? value) {
+              setState(() {
+                _stockMinimoHabilitado = value ?? false;
+              });
+            },
+          ),
+          const Text('¿Stock mínimo?'),
+          const SizedBox(width: 15),
+          Expanded(
+            child: _buildTextField(
+              _stockMinimoController,
+              'Número de stock mínimo',
+              isNumber: true,
+              icon: Remix.alarm_warning_line,
+              enabled: _stockMinimoHabilitado,
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+),
               ],
             ),
           ),
@@ -223,20 +269,34 @@ Widget build(BuildContext context) {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
-              ),
-              ElevatedButton(
-                onPressed: _addElectronic,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        const Color(0xFF971B81), // Color del texto e ícono
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text("Cancelar"),
                 ),
-                child: const Text('Guardar'),
-              ),
-            ],
+                ElevatedButton(
+                  onPressed: _addPapeleria,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF009FE3),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text('Guardar'),
+                ),
+              ],
           ),
         ],
       ),
@@ -286,11 +346,13 @@ Widget build(BuildContext context) {
     String label, {
     bool isNumber = false,
     IconData? icon,
+    bool enabled = true,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
         controller: controller,
+        enabled: enabled,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(
@@ -309,4 +371,26 @@ Widget build(BuildContext context) {
       ),
     );
   }
+  // Función _crearNotificacionStockBajo corregida
+Future<void> _crearNotificacionStockBajo({
+  required String productoId,
+  required String nombreProducto,
+  required int stockActual,
+  required int stockMinimo,
+}) async {
+  try {
+    await FirebaseFirestore.instance.collection('notificaciones').add({
+      'titulo': '⚠️ Stock bajo en OXXO Adultos',
+      'mensaje': 'El producto "$nombreProducto" tiene stock bajo ($stockActual unidades).',
+      'detalle_extra': 'Stock mínimo: $stockMinimo', // <-- Corrección aquí
+      'documentoId': productoId,
+      'leida': false,
+      'fecha': FieldValue.serverTimestamp(),
+      'tipo': 'stock_bajo',
+      'categoria': 'papeleria',
+    });
+  } catch (e) {
+    print('Error al crear notificación: $e');
+  }
+}
 }

@@ -66,10 +66,7 @@ class _CocinaScreenState extends State<CocinaScreen> {
       _buildActionButtons(),
       const SizedBox(height: 10),
       Expanded(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: CocinaTable(key: _cocinaTableKey),
-        ),
       ),
     ],
   ),

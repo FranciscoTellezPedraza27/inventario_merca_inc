@@ -165,7 +165,7 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
           children: [
             const Text(
               'Agregar al Inventario',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Poppins',),
             ),
             const SizedBox(height: 15),
             _buildImagePreview(),

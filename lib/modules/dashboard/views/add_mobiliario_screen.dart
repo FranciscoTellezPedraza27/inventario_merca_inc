@@ -80,14 +80,14 @@ class _AddMobiliarioScreenState extends State<AddMobiliarioScreen> {
     }
   }
 
-  Future<void> _addElectronic() async {
+  Future<void> _addMobiliario() async {
     if (!_formKey.currentState!.validate()) return;
 
     try {
       final docRef = FirebaseFirestore.instance.collection('mobiliario').doc();
       final imageUrl = await _uploadImage(docRef.id);
 
-      final nuevaPeleria = {
+      final nuevoMobiliario = {
         'cantidad': int.parse(_cantidad.text),
         'articulo': _articuloController.text,
         'marca': _marcaController.text,
@@ -105,7 +105,7 @@ class _AddMobiliarioScreenState extends State<AddMobiliarioScreen> {
       };
 
       await docRef.set({
-        ...nuevaPeleria,
+        ...nuevoMobiliario,
         'imagen_url' : imageUrl ?? 'N/A',
         'timestamp' : FieldValue.serverTimestamp(),
       });
@@ -113,7 +113,7 @@ class _AddMobiliarioScreenState extends State<AddMobiliarioScreen> {
       await _registrarEnHistorial(
         accion: 'Creación',
         productoId: docRef.id,
-        datos: nuevaPeleria,
+        datos: nuevoMobiliario,
         imageUrl: imageUrl,
       );
 
@@ -165,7 +165,7 @@ Widget build(BuildContext context) {
         children: [
           const Text(
             'Agregar al Inventario',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Poppins',),
           ),
           const SizedBox(height: 15),
           _buildImagePreview(),
@@ -223,20 +223,34 @@ Widget build(BuildContext context) {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
-              ),
-              ElevatedButton(
-                onPressed: _addElectronic,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        const Color(0xFF971B81), // Color del texto e ícono
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text("Cancelar"),
                 ),
-                child: const Text('Guardar'),
-              ),
-            ],
+                ElevatedButton(
+                  onPressed: _addMobiliario,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF009FE3),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text('Guardar'),
+                ),
+              ],
           ),
         ],
       ),

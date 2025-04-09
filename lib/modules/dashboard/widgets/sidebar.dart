@@ -17,7 +17,7 @@ class Sidebar extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancelar", style: TextStyle(color: Colors.white)),
+              child: const Text("Cancelar", style: TextStyle(color: Colors.white, fontFamily: 'Poppins',)),
               style: TextButton.styleFrom(
                 backgroundColor: const Color(0xFF009FE3),
                 padding: const EdgeInsets.symmetric(
@@ -39,7 +39,7 @@ class Sidebar extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
               ),
-              child: const Text("Cerrar sesión", style: TextStyle(color: Colors.white)),
+              child: const Text("Cerrar sesión", style: TextStyle(color: Colors.white, fontFamily: 'Poppins',)),
             ),
           ],
         );
@@ -67,6 +67,7 @@ class Sidebar extends StatelessWidget {
               child: Text(
                 "INVENTARIO MERCA INC",
                 style: TextStyle(
+                  fontFamily: 'Poppins',
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -202,6 +203,7 @@ class Sidebar extends StatelessWidget {
       title: Text(
         title,
         style: TextStyle(
+          fontFamily: 'Poppins',
           color: Colors.white.withOpacity(isSelected ? 1 : 0.8),
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),

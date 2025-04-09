@@ -53,8 +53,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
           _buildActionButtons(),
           const SizedBox(height: 10),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('historial')
@@ -80,7 +78,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
                 },
               ),
             ),
-          ),
         ],
       ),
     );

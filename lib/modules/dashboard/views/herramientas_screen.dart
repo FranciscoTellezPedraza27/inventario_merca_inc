@@ -67,10 +67,7 @@ class _HerramientasScreenState extends State<HerramientasScreen> {
           _buildActionButtons(),
           const SizedBox(height: 10),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: HerramientasTable(key: _herramientasTableKey),
-            ),
           ),
         ],
       ),

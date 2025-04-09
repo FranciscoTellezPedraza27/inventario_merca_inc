@@ -48,6 +48,7 @@ class ViewProductsScreen extends StatelessWidget {
                         child: Text(
                           'Imagen no disponible',
                           style: TextStyle(
+                            fontFamily: 'Poppins',
                             color: Colors.grey,
                             fontStyle: FontStyle.italic,
                           ),
@@ -119,6 +120,7 @@ class ViewProductsScreen extends StatelessWidget {
         Text(
           title,
           style: const TextStyle(
+            fontFamily: 'Poppins',
             fontWeight: FontWeight.bold,
             fontSize: 14,
             color: Colors.black87,
@@ -128,6 +130,7 @@ class ViewProductsScreen extends StatelessWidget {
         Text(
           value?.toString() ?? 'N/A',
           style: const TextStyle(
+            fontFamily: 'Poppins',
             fontSize: 16,
             color: Colors.black54,
           ),

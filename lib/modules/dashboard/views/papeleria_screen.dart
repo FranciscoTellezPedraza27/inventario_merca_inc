@@ -68,10 +68,7 @@ class _PapeleriaScreenState extends State<PapeleriaScreen> {
           _buildActionButtons(),
           const SizedBox(height: 10),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: PapeleriaTable(key: _papeleriaTableKey),
-            ),
           ),
         ],
       ),

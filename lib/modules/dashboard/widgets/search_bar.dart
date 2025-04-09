@@ -130,6 +130,7 @@ class SearchBarWidget extends StatelessWidget {
       label: Text(
         label,
         style: const TextStyle(
+          fontFamily: 'Poppins',
           color: Colors.white,
           fontSize: 14,
           fontWeight: FontWeight.w500,

@@ -67,10 +67,7 @@ class _OtrosScreenState extends State<OtrosScreen> {
           _buildActionButtons(),
           const SizedBox(height: 10),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: OtrosTable(key: _otrosTableKey),
-            ),
           ),
         ],
       ),

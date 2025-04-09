@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:remixicon/remixicon.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Para obtener el usuario actual
+import 'package:intl/intl.dart'; // Para formatear fechas
 
 class EditStockScreen extends StatefulWidget {
   final QueryDocumentSnapshot document;
@@ -29,21 +31,46 @@ class _EditStockScreenState extends State<EditStockScreen> {
   }
 
   Future<void> _guardarCambios() async {
-    try {
-      await FirebaseFirestore.instance
-          .collection(widget.collectionName)
-          .doc(widget.document.id)
-          .update({widget.fieldName: _currentValue});
-      
-      if (!mounted) return;
-      Navigator.pop(context);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+  final cantidadAnterior = int.tryParse((widget.document.data() as Map<String, dynamic>)['cantidad']?.toString() ?? '') ?? 0;
+  
+  try {
+    await FirebaseFirestore.instance
+        .collection(widget.collectionName)
+        .doc(widget.document.id)
+        .update({widget.fieldName: _currentValue});
+    
+    // Registrar en historial solo si hubo cambio real
+    if (_currentValue != cantidadAnterior) {
+      await _registrarCambioHistorial(cantidadAnterior);
     }
+
+    if (!mounted) return;
+    Navigator.pop(context);
+  } catch (e) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: ${e.toString()}')),
+    );
   }
+}
+
+  Future<void> _registrarCambioHistorial(int cantidadAnterior) async {
+  final user = FirebaseAuth.instance.currentUser;
+  final data = widget.document.data() as Map<String, dynamic>;
+  
+  // En EditStockScreen, modificar el registro a:
+await FirebaseFirestore.instance.collection('historial').add({
+  'timestamp': FieldValue.serverTimestamp(), // Campo unificado
+  'usuario': user?.email ?? 'Sistema',
+  'categoria': widget.collectionName,
+  'campo': 'Cantidad', // Nuevo campo requerido
+  'tipo_movimiento': 'Modificación de stock', // Valor unificado
+  'valor_anterior': cantidadAnterior.toString(),
+  'valor_nuevo': _currentValue.toString(),
+  'producto_id': widget.document.id,
+  'imagen_url': data['imagen_url'] ?? 'N/A', // Mantener estructura
+});
+}
 
 @override
 Widget build(BuildContext context) {
@@ -63,6 +90,7 @@ Widget build(BuildContext context) {
             const Text(
               "Gestión de Cantidad",
               style: TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 18, // Tamaño de fuente más pequeño
                 fontWeight: FontWeight.bold
               ),
@@ -77,14 +105,15 @@ Widget build(BuildContext context) {
                   children: [
                     const Text(
                       "Cantidad actual:",
-                      style: TextStyle(fontSize: 14), // Texto más pequeño
+                      style: TextStyle(fontSize: 14, fontFamily: 'Poppins',), // Texto más pequeño
                     ),
                     Text(
                       '$_currentValue',
                       style: const TextStyle(
+                        fontFamily: 'Poppins',
                         fontSize: 20, // Tamaño reducido
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF009FE3),
+                        //color: Color(0xFF009FE3),
                       ),
                     ),
                   ],
@@ -100,7 +129,7 @@ Widget build(BuildContext context) {
                           onPressed: _disminuirCantidad,
                         ),
                         const Text("Disminuir", 
-                          style: TextStyle(fontSize: 11)), // Texto más pequeño
+                          style: TextStyle(fontSize: 11, fontFamily: 'Poppins',)), // Texto más pequeño
                       ],
                     ),
                     const SizedBox(width: 10),
@@ -113,7 +142,7 @@ Widget build(BuildContext context) {
                           onPressed: _aumentarCantidad,
                         ),
                         const Text("Aumentar", 
-                          style: TextStyle(fontSize: 11)), // Texto más pequeño
+                          style: TextStyle(fontSize: 11, fontFamily: 'Poppins',)), // Texto más pequeño
                       ],
                     ),
                   ],
@@ -136,13 +165,13 @@ Widget build(BuildContext context) {
                     ),
                   ),
                   child: const Text("Cancelar", 
-                    style: TextStyle(fontSize: 14)),
+                    style: TextStyle(fontSize: 14, fontFamily: 'Poppins',)),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
                   onPressed: _guardarCambios,
                   label: const Text("Guardar", // Texto más corto
-                    style: TextStyle(fontSize: 14)),
+                    style: TextStyle(fontSize: 14, fontFamily: 'Poppins',)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF009FE3),
                     foregroundColor: Colors.white,

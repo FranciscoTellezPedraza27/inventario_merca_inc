@@ -74,8 +74,7 @@ Widget build(BuildContext context) {
   // Remover esta línea: final ScrollController _dummyHorizontalController = ScrollController();
   final totalColumnsWidth = (140.0 * 12) + 190.0 + (30.0 * 12);
 
-  return Expanded(
-    child: Container(
+    return Container(
       margin: const EdgeInsets.all(6.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -164,7 +163,6 @@ Widget build(BuildContext context) {
           }
         )
       )
-    )
   );  
 }
 
@@ -207,6 +205,7 @@ DataColumn _buildHeader(String text) {
           text,
           textAlign: TextAlign.center,
           style: const TextStyle(
+            fontFamily: 'Poppins',
             fontWeight: FontWeight.bold,
             fontSize: 14,
             color: Colors.black87,
@@ -252,6 +251,7 @@ Widget _buildActionsColumn(List<QueryDocumentSnapshot> filteredData) {
             child: Text(
               "Acciones",
               style: TextStyle(
+                fontFamily: 'Poppins',
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
                 color: Colors.black87,
@@ -371,6 +371,7 @@ Widget _buildActionsColumn(List<QueryDocumentSnapshot> filteredData) {
               overflow: TextOverflow.ellipsis,
               maxLines: isWide ? 3 : 2,
               style: const TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 13,
                 color: Colors.black87,
               ),
@@ -393,7 +394,7 @@ Widget _buildActionsColumn(List<QueryDocumentSnapshot> filteredData) {
       padding: const EdgeInsets.all(20.0),
       child: Text(
         'Error: $error',
-        style: const TextStyle(color: Colors.red),
+        style: const TextStyle(color: Colors.red, fontFamily: 'Poppins',),
       ),
     ),
   );
@@ -403,7 +404,7 @@ Widget _buildActionsColumn(List<QueryDocumentSnapshot> filteredData) {
       padding: const EdgeInsets.all(20.0),
       child: Text(
         'No hay datos disponibles',
-        style: TextStyle(color: Colors.grey),
+        style: TextStyle(color: Colors.grey, fontFamily: 'Poppins',),
       ),
     ),
   );

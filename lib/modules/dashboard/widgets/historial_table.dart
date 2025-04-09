@@ -67,10 +67,9 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
 
   @override
   Widget build(BuildContext context) {
-    final totalColumnsWidth = (140.0 * 8) + (30.0 * 7); // 8 columnas con espaciado
+    final totalColumnsWidth = (160.0 * 8) + (30.0 * 7); // 8 columnas con espaciado
 
-    return Expanded(
-      child: Container(
+    return Container(
         margin: const EdgeInsets.all(6.0),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -124,7 +123,6 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
             ],
           ),
         ),
-      ),
     );
   }
 
@@ -170,6 +168,7 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
               text,
               textAlign: TextAlign.center,
               style: const TextStyle(
+                fontFamily: 'Poppins',
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
                 color: Colors.black87,
@@ -201,22 +200,40 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
   }
 
   DataRow _buildDataRow(QueryDocumentSnapshot document) {
-    final data = document.data() as Map<String, dynamic>;
-    final timestamp = (data['timestamp'] as Timestamp?)?.toDate();
-    
-    return DataRow(
-      cells: [
-        _buildDataCell(_formatDate(timestamp)),
-        _buildDataCell(_formatTime(timestamp)),
-        _buildDataCell(data['usuario'] ?? 'N/A'),
-        _buildDataCell(data['categoria'] ?? 'N/A'),
-        _buildDataCell(data['tipo_movimiento'] ?? 'N/A'),
-        _buildDataCell(data['campo'] ?? 'N/A'),
-        _buildDataCell(data['valor_anterior']?.toString() ?? '-', isWide: true),
-        _buildDataCell(data['valor_nuevo']?.toString() ?? '-', isWide: true),
-      ],
-    );
-  }
+  final data = document.data() as Map<String, dynamic>;
+  final timestamp = data['timestamp']?.toDate(); // Campo unificado
+  
+  // Detectar tipo de movimiento
+  final isStockChange = data['tipo_movimiento'] == 'Modificación de stock';
+  final isCreation = data['tipo_movimiento'] == 'Creación';
+
+  return DataRow(
+    cells: [
+      _buildDataCell(_formatDate(timestamp)),
+      _buildDataCell(_formatTime(timestamp)),
+      _buildDataCell(data['usuario'] ?? 'Sistema'),
+      _buildDataCell(data['categoria'] ?? 'N/A'),
+      _buildDataCell(data['tipo_movimiento'] ?? 'N/A'), // Campo unificado
+      _buildDataCell(isStockChange ? 'Cantidad' : data['campo'] ?? 'N/A'),
+      _buildDataCell(
+        isStockChange 
+          ? data['valor_anterior']?.toString() ?? '-'
+          : data['valor_anterior'] is String 
+              ? data['valor_anterior'] 
+              : data['valor_anterior']?.toString() ?? '-',
+        isWide: true
+      ),
+      _buildDataCell(
+        isStockChange 
+          ? data['valor_nuevo']?.toString() ?? '-'
+          : isCreation 
+              ? (data['valor_nuevo'] as String?) ?? '-' 
+              : data['valor_nuevo']?.toString() ?? '-',
+        isWide: true
+      ),
+    ],
+  );
+}
 
   DataCell _buildDataCell(String text, {bool isWide = false}) {
     return DataCell(
@@ -231,6 +248,7 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
               overflow: TextOverflow.ellipsis,
               maxLines: isWide ? 3 : 2,
               style: const TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 13,
                 color: Colors.black87,
               ),

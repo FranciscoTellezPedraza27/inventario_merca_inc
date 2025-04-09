@@ -88,7 +88,7 @@ class RouteGenerator {
     return MaterialPageRoute(
       builder: (_) => Scaffold(
         body: Center(
-          child: Text('¡Ruta no encontrada!', style: TextStyle(color: Colors.red)),
+          child: Text('¡Ruta no encontrada!', style: TextStyle(color: Colors.red, fontFamily: 'Poppins',)),
       ),
       )
     );

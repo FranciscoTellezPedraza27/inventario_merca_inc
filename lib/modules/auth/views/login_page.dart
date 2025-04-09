@@ -97,6 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: const Text(
                               'Continuar',
                               style: TextStyle(
+                                fontFamily: 'Poppins',
                                 fontSize: 16,
                                 color: Colors.white,
                               ),

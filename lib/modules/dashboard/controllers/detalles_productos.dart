@@ -4,14 +4,16 @@ import 'package:remixicon/remixicon.dart';
 
 class DetalleProductoScreen extends StatefulWidget {
   final String documentId;
+  final String categoria;
 
-  const DetalleProductoScreen({super.key, required this.documentId});
+  const DetalleProductoScreen({super.key, required this.documentId, required this.categoria});
 
   @override
   State<DetalleProductoScreen> createState() => _DetalleProductoScreenState();
 }
 
 class _DetalleProductoScreenState extends State<DetalleProductoScreen> {
+    Map<String, dynamic>? _productData; // <-- Nueva variable
   final TextEditingController _cantidadController = TextEditingController();
   final TextEditingController _stockMinimoController = TextEditingController();
   bool _isEditing = false;
@@ -26,7 +28,7 @@ class _DetalleProductoScreenState extends State<DetalleProductoScreen> {
   Future<void> _actualizarProducto() async {
     try {
       await FirebaseFirestore.instance
-          .collection('oxxokids')
+          .collection(widget.categoria)
           .doc(widget.documentId)
           .update({
         'cantidad': int.parse(_cantidadController.text),
@@ -42,14 +44,13 @@ class _DetalleProductoScreenState extends State<DetalleProductoScreen> {
           : null;
 
       if (stockMinimo != null && cantidad <= stockMinimo) {
-        await _crearNotificacionStockBajo(
-          productoId: widget.documentId,
-          nombreProducto: _cantidadController.text, // Aquí deberías obtener el nombre real
-          stockActual: cantidad,
-          stockMinimo: stockMinimo,
-        );
-      }
-
+  await _crearNotificacionStockBajo(
+    productoId: widget.documentId,
+    nombreProducto: _productData?['articulo'], // <-- Corregido aquí (usa data['articulo'])
+    stockActual: cantidad,
+    stockMinimo: stockMinimo,
+  );
+}
       setState(() => _isEditing = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -71,7 +72,6 @@ class _DetalleProductoScreenState extends State<DetalleProductoScreen> {
   required int stockMinimo,
 }) async {
   try {
-    // Primero verifica si ya existe una notificación no leída para este producto
     final query = await FirebaseFirestore.instance
         .collection('notificaciones')
         .where('documentoId', isEqualTo: productoId)
@@ -79,22 +79,21 @@ class _DetalleProductoScreenState extends State<DetalleProductoScreen> {
         .where('tipo', isEqualTo: 'stock_bajo')
         .get();
 
-    // Si no existe notificación previa, crea una nueva
     if (query.docs.isEmpty) {
       await FirebaseFirestore.instance.collection('notificaciones').add({
-        'titulo': '⚠️ Stock bajo en OXXO Kids',
-        'mensaje': 'El producto "$nombreProducto" tiene stock bajo ($stockActual unidades). Stock mínimo: $stockMinimo',
+        'titulo': '⚠️ Stock bajo en ${widget.categoria.toUpperCase()}',
+        'mensaje': 'El producto "$nombreProducto" tiene stock bajo ($stockActual unidades).', // Mensaje principal
+        'detalle_extra': 'Stock mínimo: $stockMinimo', // Nueva línea
         'documentoId': productoId,
         'leida': false,
         'fecha': FieldValue.serverTimestamp(),
         'tipo': 'stock_bajo',
-        'categoria': 'oxxokids',
-        'vista': false, // Nuevo campo para control visual
+        'categoria': widget.categoria,
+        'vista': false,
       });
-      print('Notificación de stock bajo creada para $nombreProducto');
     }
   } catch (e) {
-    print('Error al crear notificación de stock bajo: $e');
+    print('Error al crear notificación: $e');
   }
 }
 
@@ -109,7 +108,7 @@ class _DetalleProductoScreenState extends State<DetalleProductoScreen> {
           ],
           Text(
             '$label: ',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Poppins',),
           ),
           Text(value?.toString() ?? 'No especificado'),
         ],
@@ -156,7 +155,7 @@ class _DetalleProductoScreenState extends State<DetalleProductoScreen> {
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
-            .collection('oxxokids')
+            .collection(widget.categoria)
             .doc(widget.documentId)
             .get(),
         builder: (context, snapshot) {
@@ -169,6 +168,7 @@ class _DetalleProductoScreenState extends State<DetalleProductoScreen> {
           }
 
           final data = snapshot.data!.data() as Map<String, dynamic>;
+          _productData = data;
           
           // Inicializar controladores con los valores actuales
           if (_cantidadController.text.isEmpty) {
@@ -197,7 +197,7 @@ class _DetalleProductoScreenState extends State<DetalleProductoScreen> {
                   const SizedBox(height: 20),
                   const Text(
                     'Nota: Si actualizas la cantidad y queda por debajo del stock mínimo, se generará una notificación automáticamente.',
-                    style: TextStyle(color: Colors.orange),
+                    style: TextStyle(color: Colors.orange, fontFamily: 'Poppins',),
                   ),
                 ],
                 
@@ -219,6 +219,7 @@ class _DetalleProductoScreenState extends State<DetalleProductoScreen> {
                           child: Text(
                             'ALERTA: Stock bajo (${data['cantidad']}/${data['stock_minimo']})',
                             style: const TextStyle(
+                              fontFamily: 'Poppins',
                               color: Colors.red,
                               fontWeight: FontWeight.bold,
                             ),

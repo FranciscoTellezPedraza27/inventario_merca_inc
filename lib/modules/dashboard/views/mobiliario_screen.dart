@@ -68,10 +68,7 @@ class _MobiliarioScreenState extends State<MobiliarioScreen> {
           _buildActionButtons(),
           const SizedBox(height: 10),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: MobiliarioTable(key: _mobiliarioTableKey),
-            ),
           ),
         ],
       ),
