@@ -248,18 +248,19 @@ Widget _buildActionsColumn(List<QueryDocumentSnapshot> filteredData) {
       dataRowHeight: 80,
       columns: const [
         DataColumn(
-          label: Center(
-            child: Text(
-              "Acciones",
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-        ),
+  label: Expanded( // Usa Expanded para manejar el espacio
+    child: Text(
+      "Acciones",
+      textAlign: TextAlign.center, // Centra el texto
+      style: TextStyle(
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.bold,
+        fontSize: 14,
+        color: Colors.black87,
+      ),
+    ),
+  ),
+),
       ],
       rows: List.generate(filteredData.length, (index) {
         return DataRow(

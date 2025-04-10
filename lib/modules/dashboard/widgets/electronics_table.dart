@@ -235,7 +235,7 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
       _buildHeader("Antigüedad"),
       _buildHeader("Valor Aprox."),
       _buildHeader("Responsable"),
-      _buildHeader("Responsabilidad"),
+      _buildHeader("Recibo / Instructivo"),
       _buildHeader("Ubicación"),
       _buildHeader("Imagen"),
     ],
@@ -250,18 +250,19 @@ Widget _buildHorizontalScrollControl(double totalWidth) {
       dataRowHeight: 80,
       columns: const [
         DataColumn(
-          label: Center(
-            child: Text(
-              "Acciones",
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-        ),
+  label: Expanded( // Usa Expanded para manejar el espacio
+    child: Text(
+      "Acciones",
+      textAlign: TextAlign.center, // Centra el texto
+      style: TextStyle(
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.bold,
+        fontSize: 14,
+        color: Colors.black87,
+      ),
+    ),
+  ),
+),
       ],
       rows: List.generate(filteredData.length, (index) {
         return DataRow(

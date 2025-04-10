@@ -222,7 +222,7 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
                   // Fila 6: Responsable, Responsabilidad y Ubicación
                   Row(
                     children: [
-                      Expanded(child: _buildTextField(_responsabilidadController, 'Responsabilidad', icon: Remix.shield_user_line)),
+                      Expanded(child: _buildTextField(_responsabilidadController, 'Recibo / Instructivo', icon: Remix.file_text_line)),
                       const SizedBox(width: 15),
                       Expanded(child: _buildTextField(_ubicacionController, 'Ubicación', icon: Remix.map_line)),
                     ],

@@ -24,7 +24,7 @@ class SearchBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 8.0),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -40,46 +40,48 @@ class SearchBarWidget extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: SizedBox(
-                  height: 40,
-                  child: TextField(
-                    onChanged: onSearch,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-                      hintText: "Busca tu Producto",
-                      prefixIcon: const Icon(Icons.search, size: 20),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide.none,
-                      ),
+              // Elimina el Expanded y usa un Container con ancho fijo
+              Container(
+                width: 1000, // Ajusta este valor según necesites
+                height: 40,
+                child: TextField(
+                  onChanged: onSearch,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                    hintText: "Busca tu Producto",
+                    prefixIcon: const Icon(Icons.search, size: 20),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
                     ),
                   ),
                 ),
               ),
+              // Espacio flexible entre el TextField y los botones
+              const Spacer(),
+              // Botones
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-  if (showAddButton) ...[
-    _buildButton(
-      icon: Icons.add,
-      label: "Agregar Producto",
-      color: Colors.black,
-      onPressed: onAddProduct,
-    ),
-    const SizedBox(width: 10),
-                  _buildButton(
-                    icon: Icons.picture_as_pdf,
-                    label: "Generar PDF",
-                    color: const Color(0xFF009FE3),
-                    onPressed: () => _generatePDF(context),
-                  ),
-  ],
+                  if (showAddButton) ...[
+                    _buildButton(
+                      icon: Icons.add,
+                      label: "Agregar Artículo",
+                      color: const Color(0xFF009FE3),
+                      onPressed: onAddProduct,
+                    ),
+                    const SizedBox(width: 10),
+                    _buildButton(
+                      icon: Icons.picture_as_pdf,
+                      label: "Generar PDF",
+                      color: Color(0xFF971B81),
+                      onPressed: () => _generatePDF(context),
+                    ),
+                  ],
                 ],
               ),
             ],
@@ -88,7 +90,6 @@ class SearchBarWidget extends StatelessWidget {
       ),
     );
   }
-
   Future<void> _generatePDF(BuildContext context) async {
     try {
       // Obtener datos de Firestore usando la configuración

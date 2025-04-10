@@ -63,18 +63,14 @@ class ViewElectronicsScreen extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    _buildDetailRow("Artículo", data['articulo'], "Marca", data['marca']),
-                    _buildDetailRow("Modelo", data['modelo'], "Especificaciones", data['especificaciones']),
-                    _buildDetailRow("N° Producto", data['numero_producto'], "N° Serie", data['numero_serie']),
-                    _buildDetailRow(
-                      "Antigüedad", 
-                      data['antiguedad'], 
-                      "Valor Aprox.", 
-                      data['valor_aprox'] != null 
+                    _buildDetailRow("Cantidad", data['cantidad'], "Artículo", data['articulo']),
+                    _buildDetailRow("Marca", data['marca'], "Modelo", data['modelo']),
+                    _buildDetailRow("Especificaciones", data['especificaciones'], "N° Producto", data['numero_prodcuto']),
+                    _buildDetailRow("N° Serie", data['numero_serie'], "Antigüedad", data['antiguedad']),
+                    _buildDetailRow("Valor Aprox.", data['valor_aprox'] != null 
                         ? "\$${(double.tryParse(data['valor_aprox'].toString())?.toStringAsFixed(2) ?? '0.00')}"
-                        : "N/A"
-                    ),
-                    _buildDetailRow("Responsable", data['responsable'], "Ubicación", data['ubicacion']),
+                        : "N/A", "Responsable", data['responsable']),
+                    _buildDetailRow("Recibo / Instructivo", data['responsabilidad'], "Ubicación", data['ubicacion']),
                   ],
                 ),
               ),

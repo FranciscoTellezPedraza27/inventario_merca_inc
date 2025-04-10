@@ -45,10 +45,6 @@ class TopBar extends StatelessWidget {
                           fontSize: 18,
                           fontWeight: FontWeight.bold),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.close, size: 20),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
                   ],
                 ),
               ),
@@ -199,13 +195,13 @@ class TopBar extends StatelessWidget {
     String notificacionId,
     String categoria,
   ) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DetalleProductoScreen(
-          documentId: productoId,
-          categoria: categoria,
-        ),
+    await showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black54, // Fondo semitransparente
+      builder: (context) => DetalleProductoModal(
+        documentId: productoId,
+        categoria: categoria,
       ),
     );
     _marcarComoLeida(notificacionId);

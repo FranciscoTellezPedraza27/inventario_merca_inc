@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'historial_top.dart'; // Ajusta la ruta según tu estructura de archivos
 
 class HistorialTable extends StatefulWidget {
   final List<QueryDocumentSnapshot> documentos;
+  final String searchQuery;
   
   const HistorialTable({
     Key? key,
     required this.documentos,
+    required this.searchQuery,
   }) : super(key: key);
 
   @override
@@ -20,14 +23,16 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
   final ScrollController _verticalScrollController = ScrollController();
   final double _actionsColumnWidth = 190.0;
   final ScrollController _dummyHorizontalController = ScrollController();
-  String _searchQuery = "";
-    bool get wantKeepAlive => false; // Esto fuerza la recarga cuando cambia el estado
+
+  @override
+  bool get wantKeepAlive => true; // Cambiado a true para mantener el estado
 
 
   @override
   void initState() {
     super.initState();
-    _documentosFiltrados = widget.documentos;
+    _documentosFiltrados = widget.documentos; // Primero asignar
+    _aplicarFiltros(); // Luego filtrar
     _setupScrollSync();
   }
 
@@ -47,16 +52,32 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
     });
   }
 
-  void updateSearchQuery(String query) {
+  @override
+  void didUpdateWidget(HistorialTable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.documentos != widget.documentos || oldWidget.searchQuery != widget.searchQuery) {
+      _aplicarFiltros();
+    }
+  }
+
+
+    void _aplicarFiltros() {
+    final searchLower = widget.searchQuery.toLowerCase();
+    
     setState(() {
-      _searchQuery = query.toLowerCase();
       _documentosFiltrados = widget.documentos.where((doc) {
         final data = doc.data() as Map<String, dynamic>;
-        return data['usuario']?.toString().toLowerCase().contains(_searchQuery) == true ||
-               data['categoria']?.toString().toLowerCase().contains(_searchQuery) == true ||
-               data['tipo_movimiento']?.toString().toLowerCase().contains(_searchQuery) == true;
+        return _cumpleBusqueda(data, searchLower);
       }).toList();
     });
+  }
+
+      bool _cumpleBusqueda(Map<String, dynamic> data, String query) {
+    if (query.isEmpty) return true;
+    
+    return data['usuario']?.toString().toLowerCase().contains(query) == true ||
+           data['categoria']?.toString().toLowerCase().contains(query) == true ||
+           data['tipo_movimiento']?.toString().toLowerCase().contains(query) == true;
   }
 
   @override
@@ -200,40 +221,36 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
   }
 
   DataRow _buildDataRow(QueryDocumentSnapshot document) {
-  final data = document.data() as Map<String, dynamic>;
-  final timestamp = data['timestamp']?.toDate(); // Campo unificado
-  
-  // Detectar tipo de movimiento
-  final isStockChange = data['tipo_movimiento'] == 'Modificación de stock';
-  final isCreation = data['tipo_movimiento'] == 'Creación';
+    final data = document.data() as Map<String, dynamic>;
+    final timestamp = data['timestamp']?.toDate();
+    
+    return DataRow(
+      cells: [
+        _buildDataCell(_formatDate(timestamp)),
+        _buildDataCell(_formatTime(timestamp)),
+        _buildDataCell(data['usuario'] ?? 'Sistema'),
+        _buildDataCell(data['categoria'] ?? 'N/A'),
+        _buildDataCell(data['tipo_movimiento'] ?? 'N/A'),
+        _buildDataCell(_obtenerCampo(data)),
+        _buildDataCell(_obtenerValorAnterior(data), isWide: true),
+        _buildDataCell(_obtenerValorNuevo(data), isWide: true),
+      ],
+    );
+  }
 
-  return DataRow(
-    cells: [
-      _buildDataCell(_formatDate(timestamp)),
-      _buildDataCell(_formatTime(timestamp)),
-      _buildDataCell(data['usuario'] ?? 'Sistema'),
-      _buildDataCell(data['categoria'] ?? 'N/A'),
-      _buildDataCell(data['tipo_movimiento'] ?? 'N/A'), // Campo unificado
-      _buildDataCell(isStockChange ? 'Cantidad' : data['campo'] ?? 'N/A'),
-      _buildDataCell(
-        isStockChange 
-          ? data['valor_anterior']?.toString() ?? '-'
-          : data['valor_anterior'] is String 
-              ? data['valor_anterior'] 
-              : data['valor_anterior']?.toString() ?? '-',
-        isWide: true
-      ),
-      _buildDataCell(
-        isStockChange 
-          ? data['valor_nuevo']?.toString() ?? '-'
-          : isCreation 
-              ? (data['valor_nuevo'] as String?) ?? '-' 
-              : data['valor_nuevo']?.toString() ?? '-',
-        isWide: true
-      ),
-    ],
-  );
-}
+  String _obtenerCampo(Map<String, dynamic> data) {
+    return data['tipo_movimiento'] == 'Modificación de stock' 
+        ? 'Cantidad' 
+        : data['campo'] ?? 'N/A';
+  }
+
+  String _obtenerValorAnterior(Map<String, dynamic> data) {
+    return data['valor_anterior']?.toString() ?? '-';
+  }
+
+  String _obtenerValorNuevo(Map<String, dynamic> data) {
+    return data['valor_nuevo']?.toString() ?? '-';
+  }
 
   DataCell _buildDataCell(String text, {bool isWide = false}) {
     return DataCell(
