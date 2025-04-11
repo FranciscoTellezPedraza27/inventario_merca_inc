@@ -59,7 +59,7 @@ class _OtrosScreenState extends State<OtrosScreen> {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        title: TopBar(title: "Otros"), // Aquí usamos el TopBar
+        title: TopBar(title: "Otros"),
       ),
       drawer: const Sidebar(),
       body: Column(

@@ -86,126 +86,69 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final totalColumnsWidth = (160.0 * 8) + (30.0 * 7); // 8 columnas con espaciado
-
-    return Container(
-        margin: const EdgeInsets.all(6.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8.0),
-          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
-        ),
-        child: ScrollbarTheme(
-          data: ScrollbarThemeData(
-            thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
-              if (states.contains(MaterialState.hovered)) return Colors.black54;
-              if (states.contains(MaterialState.dragged)) return Colors.black87;
-              return Colors.black;
-            }),
-            thickness: MaterialStateProperty.all(8),
-            radius: const Radius.circular(10),
-          ),
-          child: Stack(
-            children: [
-              Scrollbar(
-                controller: _verticalScrollController,
-                thumbVisibility: true,
-                child: SingleChildScrollView(
-                  controller: _verticalScrollController,
-                  scrollDirection: Axis.vertical,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Stack(
-                      children: [
-                        SingleChildScrollView(
-                          controller: _horizontalScrollController,
-                          scrollDirection: Axis.horizontal,
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minWidth: totalColumnsWidth,
-                              maxWidth: totalColumnsWidth,
-                            ),
-                            child: _buildMainDataTable(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+@override
+Widget build(BuildContext context) {
+  return Container(
+    margin: EdgeInsets.zero,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(8.0),
+      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+    ),
+    child: Scrollbar(
+      controller: _verticalScrollController,
+      thumbVisibility: true,
+      child: SingleChildScrollView(
+        controller: _verticalScrollController,
+        child: Scrollbar(
+          controller: _horizontalScrollController,
+          thumbVisibility: true,
+          notificationPredicate: (notification) => notification.depth == 0,
+          child: SingleChildScrollView(
+            controller: _horizontalScrollController,
+            scrollDirection: Axis.horizontal,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width,
               ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: _buildHorizontalScrollControl(totalColumnsWidth),
-              ),
-            ],
-          ),
-        ),
-    );
-  }
-
-  Widget _buildHorizontalScrollControl(double totalWidth) {
-    return Container(
-      height: 12,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            spreadRadius: 1,
-            offset: const Offset(0, -2)
-          )
-        ],
-      ),
-      child: Scrollbar(
-        controller: _dummyHorizontalController,
-        thumbVisibility: true,
-        trackVisibility: true,
-        child: SingleChildScrollView(
-          controller: _dummyHorizontalController,
-          scrollDirection: Axis.horizontal,
-          physics: const ClampingScrollPhysics(),
-          child: SizedBox(
-            width: totalWidth,
-            height: 1,
-          ),
-        ),
-      ),
-    );
-  }
-
-  DataColumn _buildHeader(String text) {
-    return DataColumn(
-      label: SizedBox(
-        width: 140,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-            child: Text(
-              text,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
+              child: _buildMainDataTable(),
             ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
+DataColumn _buildHeader(String text, {double width = 140}) {
+  return DataColumn(
+    label: SizedBox(
+      width: width,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 
   Widget _buildMainDataTable() {
     return DataTable(
       columnSpacing: 30,
       headingRowHeight: 60,
-      dataRowHeight: 100,
+      dataRowHeight: 80,
       columns: [
         _buildHeader("Fecha"),
         _buildHeader("Hora"),
@@ -213,8 +156,8 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
         _buildHeader("Categoría"),
         _buildHeader("Tipo Mov."),
         _buildHeader("Campo"),
-        _buildHeader("Valor Anterior"),
-        _buildHeader("Valor Nuevo"),
+        _buildHeader("Valor Anterior", width: 190),
+        _buildHeader("Valor Nuevo", width: 190),
       ],
       rows: _documentosFiltrados.map((document) => _buildDataRow(document)).toList(),
     );
@@ -252,29 +195,29 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
     return data['valor_nuevo']?.toString() ?? '-';
   }
 
-  DataCell _buildDataCell(String text, {bool isWide = false}) {
-    return DataCell(
-      Container(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Center(
-          child: SizedBox(
-            width: isWide ? 190 : null,
-            child: Text(
-              text,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              maxLines: isWide ? 3 : 2,
-              style: const TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 13,
-                color: Colors.black87,
-              ),
+DataCell _buildDataCell(String? text, {bool isWide = false}) {
+  return DataCell(
+    Container(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Center(
+        child: SizedBox(
+          width: isWide ? 190 : null,
+          child: Text(
+            text ?? 'N/A',
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: isWide ? 3 : 2,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 13,
+              color: Colors.black87,
             ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   String _formatDate(DateTime? date) => date != null 
       ? '${date.day.toString().padLeft(2,'0')}/${date.month.toString().padLeft(2,'0')}/${date.year}'

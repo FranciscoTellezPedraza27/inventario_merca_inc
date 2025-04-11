@@ -15,33 +15,47 @@ class Sidebar extends StatelessWidget {
           backgroundColor: Colors.white,
           content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancelar", style: TextStyle(color: Colors.white, fontFamily: 'Poppins',)),
-              style: TextButton.styleFrom(
-                backgroundColor: const Color(0xFF009FE3),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 12
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)
-                )
-              ),
+  Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(
+            "Cancelar",
+            style: TextStyle(color: Colors.white, fontFamily: 'Poppins'),
+          ),
+          style: TextButton.styleFrom(
+            backgroundColor: const Color(0xFF009FE3),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _signOut(context);
-              },
-              style: TextButton.styleFrom(
-                backgroundColor: const Color(0xFF971B81),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
-              ),
-              child: const Text("Cerrar sesión", style: TextStyle(color: Colors.white, fontFamily: 'Poppins',)),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            _signOut(context);
+          },
+          child: const Text(
+            "Cerrar sesión",
+            style: TextStyle(color: Colors.white, fontFamily: 'Poppins'),
+          ),
+          style: TextButton.styleFrom(
+            backgroundColor: const Color(0xFF971B81),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
-          ],
+          ),
+        ),
+      ],
+    ),
+  ),
+],
+
         );
       },
     );

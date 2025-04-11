@@ -94,57 +94,54 @@ class PdfService {
   }
 
   static Map<int, pw.TableColumnWidth> _calculateColumnWidths() {
-    return {
-      0: pw.FixedColumnWidth(65),
-      1: pw.FlexColumnWidth(3.2),
-      2: pw.FlexColumnWidth(2.2),
-      3: pw.FlexColumnWidth(2.8),
-      4: pw.FlexColumnWidth(5.5),
-      5: pw.FlexColumnWidth(3.2),
-      6: pw.FlexColumnWidth(3.5),
-      7: pw.FixedColumnWidth(85),
-      8: pw.FlexColumnWidth(4.2),
-      9: pw.FlexColumnWidth(3.8),
-      10: pw.FlexColumnWidth(4.8),
-      11: pw.FlexColumnWidth(4.8),
-    };
-  }
+  return {
+    0: pw.FlexColumnWidth(1.5), // Ajusta el ancho de la columna de fecha
+    1: pw.FlexColumnWidth(1.2), // Ajusta el ancho de la columna de hora
+    2: pw.FlexColumnWidth(2), // Ajusta el ancho de la columna de usuario
+    3: pw.FlexColumnWidth(1.8), // Ajusta el ancho de la columna de categoría
+    4: pw.FlexColumnWidth(2.8), // Ajusta el ancho de la columna de tipo de movimiento
+    5: pw.FlexColumnWidth(2), // Ajusta el ancho de la columna de campo
+    6: pw.FlexColumnWidth(2), // Ajusta el ancho de la columna de valor anterior
+    7: pw.FlexColumnWidth(2), // Ajusta el ancho de la columna de valor nuevo
+  };
+}
 
-  static pw.TableRow _buildTableHeader(List<String> headers) {
-    return pw.TableRow(
-      decoration: pw.BoxDecoration(color: PdfColors.blueGrey100),
-      children: headers.map((header) => pw.Padding(
-        padding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 3),
-        child: pw.Text(
-          header,
-          style: pw.TextStyle(
-            fontSize: 8.5,
-            fontWeight: pw.FontWeight.bold,
-            color: PdfColors.blueGrey800,
-          ),
-          textAlign: pw.TextAlign.center,
-          maxLines: 2,
-        ),
-      )).toList(),
-    );
-  }
-
-  static List<pw.TableRow> _buildTableRows(List<String> fields, List<Map<String, dynamic>> data) {
-    return data.map((item) => pw.TableRow(
-      children: fields.map((field) => _buildTableCell(
-        item[field]?.toString().replaceAll('\n', ' ') ?? 'N/A',
-      )).toList(),
-    )).toList();
-  }
-
-  static pw.Widget _buildTableCell(String text) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+static pw.TableRow _buildTableHeader(List<String> headers) {
+  return pw.TableRow(
+    decoration: pw.BoxDecoration(color: PdfColors.blueGrey100),
+    children: headers.map((header) => pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 3),
       child: pw.Text(
-        text,
+        header,
+        style: pw.TextStyle(
+          fontSize: 8.5,
+          fontWeight: pw.FontWeight.bold,
+          color: PdfColors.blueGrey800,
+        ),
         textAlign: pw.TextAlign.center,
-        style: const pw.TextStyle(fontSize: 9),
+        maxLines: 2,
       ),
-    );
-  }
+    )).toList(),
+  );
+}
+
+static List<pw.TableRow> _buildTableRows(List<String> fields, List<Map<String, dynamic>> data) {
+  return data.map((item) => pw.TableRow(
+    children: fields.map((field) => _buildTableCell(
+      item[field]?.toString().replaceAll('\n','')?? 'N/A',
+    )).toList(),
+  )).toList();
+}
+
+static pw.Widget _buildTableCell(String text) {
+  return pw.Padding(
+    padding: const pw.EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+    child: pw.Text(
+      text,
+      textAlign: pw.TextAlign.center,
+      style: const pw.TextStyle(fontSize: 9),
+      maxLines: 3, // Ajusta el número de líneas máximas
+    ),
+  );
+}
 }

@@ -246,54 +246,79 @@ class _DetalleProductoModalState extends State<DetalleProductoModal> {
                         ),
                       ],
                       Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: _isEditing
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        setState(() => _isEditing = false),
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: const Color(
-                                          0xFF971B81), // Color del texto e ícono
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 12),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: const Text('Cancelar',
-                                        style: TextStyle(fontSize: 13)),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  ElevatedButton(
-                                    onPressed: _actualizarProducto,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF009FE3),
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 15),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: const Text('Guardar',
-                                        style: TextStyle(fontSize: 13)),
-                                  ),
-                                ],
-                              )
-                            : Align(
-                                alignment: Alignment.centerRight,
-                                child: IconButton(
-                                  icon: const Icon(Icons.edit,
-                                      size: 20, color: Colors.blue),
-                                  onPressed: () =>
-                                      setState(() => _isEditing = true),
-                                ),
-                              ),
-                      ),
+  padding: const EdgeInsets.only(top: 16),
+  child: _isEditing
+      ? Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: () => setState(() => _isEditing = false),
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFF971B81),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text('Cancelar', style: TextStyle(fontSize: 13)),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: _actualizarProducto,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF009FE3),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text('Guardar', style: TextStyle(fontSize: 13)),
+            ),
+          ],
+        )
+      : Align(
+          alignment: Alignment.centerRight,
+          child: Container( // Aquí faltaba el parámetro 'child'
+            decoration: BoxDecoration(
+              color: const Color(0xFFF6A000),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: IconButton(
+              icon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Remix.edit_box_line,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Editar',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              style: IconButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              onPressed: () => setState(() => _isEditing = true),
+            ),
+          ),
+        ),
+),
                     ],
                   ),
                 );
