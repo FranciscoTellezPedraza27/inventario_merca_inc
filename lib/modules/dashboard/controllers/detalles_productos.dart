@@ -281,44 +281,36 @@ class _DetalleProductoModalState extends State<DetalleProductoModal> {
           ],
         )
       : Align(
-          alignment: Alignment.centerRight,
-          child: Container( // Aquí faltaba el parámetro 'child'
-            decoration: BoxDecoration(
-              color: const Color(0xFFF6A000),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: IconButton(
-              icon: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Remix.edit_box_line,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Editar',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              style: IconButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ),
-              onPressed: () => setState(() => _isEditing = true),
-            ),
+  alignment: Alignment.centerRight,
+  child: TextButton(
+    onPressed: () => setState(() => _isEditing = true),
+    style: TextButton.styleFrom(
+      backgroundColor: const Color(0xFFF6A000), // Color naranja
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8), // Mismo radio que "Cerrar"
+      ),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(
+          Remix.edit_box_line,
+          size: 20,
+          color: Colors.white,
+        ),
+        const SizedBox(width: 5),
+        Text(
+          'Editar',
+          style: TextStyle(
+            fontSize: 14, // Mismo tamaño que "Cerrar"
+            fontWeight: FontWeight.w600,
           ),
         ),
-),
+      ],
+    ),
+  ),),)
                     ],
                   ),
                 );

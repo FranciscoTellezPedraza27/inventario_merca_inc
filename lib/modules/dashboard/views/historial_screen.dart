@@ -69,7 +69,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
         "campo",
         "valor_anterior",
         "valor_nuevo"
-      ], // Exact match
+      ],
     );
 
     try {
@@ -85,7 +85,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
       final data = querySnapshot.docs.map((doc) {
         final raw = doc.data() as Map<String, dynamic>;
         final timestamp = raw['timestamp'] as Timestamp;
-        print('[DEBUG] Documento Firestore: $raw');
 
         return {
           'fecha': dateFormat.format(timestamp.toDate()),
@@ -128,36 +127,25 @@ class _HistorialScreenState extends State<HistorialScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
- appBar: AppBar(
-  toolbarHeight: 60,
-  backgroundColor: Colors.white,
-  elevation: 2,
-  title: const TopBar( // ← Sin parámetros extra
-    title: "Historial de Movimientos",
-  ),
-  leading: Builder(
-    builder: (context) => IconButton(
-      icon: const Icon(Icons.menu, color: Color(0xFF971B81)),
-      onPressed: () => Scaffold.of(context).openDrawer(),
-    ),
-  ),
-      ),
-      drawer: const Sidebar(),
-      body: Container(
-        padding: const EdgeInsets.only(left: 8, right: 8, top: 15, bottom: 8),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white, Color(0xFFF8E8F5)],
+      appBar: AppBar(
+        toolbarHeight: 60,
+        backgroundColor: Colors.white,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        child: Column(
-          children: [
-            // Barra de búsqueda y filtros (estilo de SearchBarWidget)
-            Container(
-              margin: EdgeInsets.zero, // ← Eliminar margen
-
+        title: const TopBar(title: "Historial de Movimientos"),
+      ),
+      drawer: const Sidebar(),
+      body: Column(
+        children: [
+          _buildActionBar(),
+          const SizedBox(height: 10),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8.0),
@@ -169,75 +157,69 @@ class _HistorialScreenState extends State<HistorialScreen> {
                   ),
                 ],
               ),
-              padding: const EdgeInsets.all(12.0),
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _getFilteredStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError)
+                    return _buildErrorState(snapshot.error.toString());
+                  if (snapshot.connectionState == ConnectionState.waiting)
+                    return _buildLoadingState();
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty)
+                    return _buildEmptyState();
 
-              child: Row(
-                children: [
-                  const SizedBox(height: 8), // ← Reducir espacio
-
-                  Expanded(
-                    child: TextField(
-                      onChanged: (query) =>
-                          setState(() => _searchQuery = query),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 0, horizontal: 12),
-                        hintText: "Buscar en historial...",
-                        prefixIcon: const Icon(Icons.search, size: 20),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  _buildDropdownCategorias(),
-                  const SizedBox(width: 10),
-                  _buildButton(
-                    icon: Icons.picture_as_pdf,
-                    label: "Generar PDF",
-                    color: const Color(0xFF971B81),
-                    onPressed: _generarPDF,
-                  ),
-                ],
+                  return HistorialTable(
+                    documentos: _aplicarFiltroBusqueda(snapshot.data!.docs),
+                    searchQuery: _searchQuery,
+                  );
+                },
               ),
             ),
-            const SizedBox(height: 15),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
             Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: _getFilteredStream(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError)
-                      return _buildErrorState(snapshot.error.toString());
-                    if (snapshot.connectionState == ConnectionState.waiting)
-                      return _buildLoadingState();
-                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty)
-                      return _buildEmptyState();
-
-                    return HistorialTable(
-                      documentos: _aplicarFiltroBusqueda(snapshot.data!.docs),
-                      searchQuery: _searchQuery,
-                    );
-                  },
+              child: TextField(
+                onChanged: (query) => setState(() => _searchQuery = query),
+                decoration: InputDecoration(
+                  isDense: true,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                  hintText: "Buscar en historial...",
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
             ),
+            const SizedBox(width: 10),
+            _buildDropdownCategorias(),
+            const SizedBox(width: 10),
+            _buildPDFButton(),
           ],
         ),
       ),
@@ -246,20 +228,22 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
   Widget _buildDropdownCategorias() {
     return Container(
+      width: 200,
+      height: 38,
       decoration: BoxDecoration(
+        color: Colors.grey.shade200,
         borderRadius: BorderRadius.circular(8.0),
-        color: Colors.grey.shade100,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.only(left: 12, right: 8),
       child: DropdownButton<String>(
         value: _selectedCategoria,
         underline: Container(),
+        isExpanded: true,
         icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF971B81)),
+        dropdownColor: Colors.white,
+        borderRadius: BorderRadius.circular(8),
         style: const TextStyle(
-          color: Colors.black87,
-          fontSize: 14,
-          fontFamily: 'Poppins',
-        ),
+            color: Colors.black87, fontSize: 14, fontFamily: 'Poppins'),
         items: _categorias.map((String value) {
           return DropdownMenuItem<String>(
             value: value,
@@ -271,18 +255,13 @@ class _HistorialScreenState extends State<HistorialScreen> {
     );
   }
 
-  Widget _buildButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onPressed,
-  }) {
+  Widget _buildPDFButton() {
     return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, color: Colors.white, size: 20),
-      label: Text(
-        label,
-        style: const TextStyle(
+      onPressed: _generarPDF,
+      icon: const Icon(Icons.picture_as_pdf, color: Colors.white, size: 20),
+      label: const Text(
+        "Generar PDF",
+        style: TextStyle(
           fontFamily: 'Poppins',
           color: Colors.white,
           fontSize: 14,
@@ -290,7 +269,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
         ),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: color,
+        backgroundColor: const Color(0xFF971B81),
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),

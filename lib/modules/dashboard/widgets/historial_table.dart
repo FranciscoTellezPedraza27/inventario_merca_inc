@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'historial_top.dart'; // Ajusta la ruta según tu estructura de archivos
 
 class HistorialTable extends StatefulWidget {
   final List<QueryDocumentSnapshot> documentos;
@@ -21,7 +19,6 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
   late List<QueryDocumentSnapshot> _documentosFiltrados;
   final ScrollController _horizontalScrollController = ScrollController();
   final ScrollController _verticalScrollController = ScrollController();
-  final double _actionsColumnWidth = 190.0;
   final ScrollController _dummyHorizontalController = ScrollController();
 
   @override
