@@ -30,21 +30,43 @@ class _HistorialScreenState extends State<HistorialScreen> {
   }
 
   void _cargarCategorias() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('historial')
-        .orderBy('categoria')
-        .get();
+  final snapshot = await FirebaseFirestore.instance
+      .collection('historial')
+      .get();
 
-    final categorias = snapshot.docs
-        .map((doc) => doc['categoria'] as String?)
-        .where((c) => c != null)
-        .toSet()
-        .toList();
+  // Paso 1: Extraer y normalizar
+  final rawCategories = snapshot.docs
+      .map((doc) => doc['categoria'] as String?)
+      .where((c) => c != null && c.trim().isNotEmpty)
+      .toList();
 
-    setState(() {
-      _categorias = ['Todas', ...categorias.cast<String>()];
-    });
+  // Paso 2: Normalización avanzada
+  final normalizedCategories = rawCategories.map((c) {
+    return c!
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'[áàäâ]'), 'a') // Elimina tildes y variantes
+        .replaceAll(RegExp(r'[éèëê]'), 'e')
+        .replaceAll(RegExp(r'[íìïî]'), 'i')
+        .replaceAll(RegExp(r'[óòöô]'), 'o')
+        .replaceAll(RegExp(r'[úùüû]'), 'u')
+        .replaceAll(RegExp(r'[^a-z0-9]'), ''); // Elimina caracteres especiales
+  }).toList();
+
+  // Paso 3: Eliminar duplicados manteniendo el primer formato original
+  final uniqueCategories = <String, String>{};
+  for (int i = 0; i < rawCategories.length; i++) {
+    final original = rawCategories[i]!;
+    final normalized = normalizedCategories[i];
+    if (!uniqueCategories.containsKey(normalized)) {
+      uniqueCategories[normalized] = original;
+    }
   }
+
+  setState(() {
+    _categorias = ['Todas', ...uniqueCategories.values.toList()];
+  });
+}
 
   Future<void> _generarPDF() async {
     final pdfConfig = ReportConfig(
@@ -113,16 +135,11 @@ class _HistorialScreenState extends State<HistorialScreen> {
   }
 
   Stream<QuerySnapshot> _getFilteredStream() {
-    Query query = FirebaseFirestore.instance
-        .collection('historial')
-        .orderBy('timestamp', descending: true);
-
-    if (_selectedCategoria != null && _selectedCategoria != 'Todas') {
-      query = query.where('categoria', isEqualTo: _selectedCategoria);
-    }
-
-    return query.snapshots();
-  }
+  return FirebaseFirestore.instance
+      .collection('historial')
+      .orderBy('timestamp', descending: true)
+      .snapshots();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +256,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
         value: _selectedCategoria,
         underline: Container(),
         isExpanded: true,
-        icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF971B81)),
+        icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF009FE3)),
         dropdownColor: Colors.white,
         borderRadius: BorderRadius.circular(8),
         style: const TextStyle(
@@ -311,14 +328,59 @@ class _HistorialScreenState extends State<HistorialScreen> {
         ),
       );
 
-  List<QueryDocumentSnapshot> _aplicarFiltroBusqueda(
-      List<QueryDocumentSnapshot> docs) {
-    return docs.where((doc) {
-      final data = doc.data() as Map<String, dynamic>;
-      final query = _searchQuery.toLowerCase();
-      return query.isEmpty ||
-          data['usuario'].toString().toLowerCase().contains(query) ||
-          data['categoria'].toString().toLowerCase().contains(query);
-    }).toList();
-  }
+      String _normalizarTexto(String input) {
+  return input
+      .toLowerCase()
+      .replaceAll(RegExp(r'[áàäâ]'), 'a')
+      .replaceAll(RegExp(r'[éèëê]'), 'e')
+      .replaceAll(RegExp(r'[íìïî]'), 'i')
+      .replaceAll(RegExp(r'[óòöô]'), 'o')
+      .replaceAll(RegExp(r'[úùüû]'), 'u')
+      .replaceAll(RegExp(r'[^a-z0-9]'), '') // Elimina caracteres especiales
+      .replaceAll(' ', ''); // Elimina espacios
+}
+
+List<QueryDocumentSnapshot> _aplicarFiltroBusqueda(List<QueryDocumentSnapshot> docs) {
+  final searchQueryNormalized = _normalizarTexto(_searchQuery);
+  final categoriaSeleccionadaNormalized = _selectedCategoria == 'Todas' 
+      ? null 
+      : _normalizarTexto(_selectedCategoria!);
+
+  return docs.where((doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    
+    // 1. Filtrar por categoría normalizada
+    if (categoriaSeleccionadaNormalized != null) {
+      final categoriaDoc = _normalizarTexto(data['categoria']?.toString() ?? '');
+      if (categoriaDoc != categoriaSeleccionadaNormalized) {
+        return false;
+      }
+    }
+
+    // 2. Filtrar por búsqueda en múltiples campos
+    if (searchQueryNormalized.isNotEmpty) {
+      final usuario = _normalizarTexto(data['usuario']?.toString() ?? '');
+      final categoria = _normalizarTexto(data['categoria']?.toString() ?? '');
+      final tipoMovimiento = _normalizarTexto(data['tipo_movimiento']?.toString() ?? '');
+      final campo = _normalizarTexto(data['campo']?.toString() ?? '');
+      final valorAnterior = _normalizarTexto(data['valor_anterior']?.toString() ?? '');
+      final valorNuevo = _normalizarTexto(data['valor_nuevo']?.toString() ?? '');
+
+      final camposConcatenados = [
+        usuario,
+        categoria,
+        tipoMovimiento,
+        campo,
+        valorAnterior,
+        valorNuevo,
+      ].join(' ');
+
+      if (!camposConcatenados.contains(searchQueryNormalized)) {
+        return false;
+      }
+    }
+
+    return true;
+  }).toList();
+}
 }

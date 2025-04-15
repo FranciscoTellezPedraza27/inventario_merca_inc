@@ -232,18 +232,6 @@ class _DetalleProductoModalState extends State<DetalleProductoModal> {
                       ] else ...[
                         _buildCompactEditableField(
                             'Cantidad', _cantidadController),
-                        const SizedBox(height: 12),
-                        _buildCompactEditableField(
-                            'Stock mínimo', _stockMinimoController),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Nota: Stock bajo generará notificación automática',
-                          style: TextStyle(
-                            color: Colors.orange,
-                            fontSize: 12,
-                            fontFamily: 'Poppins',
-                          ),
-                        ),
                       ],
                       Padding(
   padding: const EdgeInsets.only(top: 16),

@@ -61,6 +61,7 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
     void _aplicarFiltros() {
     final searchLower = widget.searchQuery.toLowerCase();
     
+    
     setState(() {
       _documentosFiltrados = widget.documentos.where((doc) {
         final data = doc.data() as Map<String, dynamic>;
@@ -69,13 +70,17 @@ class HistorialTableState extends State<HistorialTable> with AutomaticKeepAliveC
     });
   }
 
-      bool _cumpleBusqueda(Map<String, dynamic> data, String query) {
-    if (query.isEmpty) return true;
-    
-    return data['usuario']?.toString().toLowerCase().contains(query) == true ||
-           data['categoria']?.toString().toLowerCase().contains(query) == true ||
-           data['tipo_movimiento']?.toString().toLowerCase().contains(query) == true;
-  }
+bool _cumpleBusqueda(Map<String, dynamic> data, String query) {
+  if (query.isEmpty) return true;
+  
+  final searchLower = query.toLowerCase();
+  return 
+    data['usuario']?.toString().toLowerCase().contains(searchLower) == true ||
+    data['categoria']?.toString().toLowerCase().contains(searchLower) == true ||
+    data['tipo_movimiento']?.toString().toLowerCase().contains(searchLower) == true ||
+    data['campo']?.toString().toLowerCase().contains(searchLower) == true || // Nuevo
+    data['valor_nuevo']?.toString().toLowerCase().contains(searchLower) == true; // Nuevo
+}
 
   @override
   void dispose() {

@@ -156,7 +156,7 @@ class _AddOxxoAdultosScreenState extends State<AddOxxoAdultosScreen> {
   await FirebaseFirestore.instance.collection('historial').add({
     'timestamp': FieldValue.serverTimestamp(),
     'usuario': FirebaseAuth.instance.currentUser?.email ?? 'Sistema', // Reemplaza con tu sistema de autenticación
-    'categoria': 'OXXO Adultos',
+    'categoria': 'adultos',
     'campo': 'Nuevo producto',
     'tipo_movimiento': accion,
     'valor_anterior': 'NO EXISTÍA',

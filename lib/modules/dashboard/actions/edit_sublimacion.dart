@@ -24,6 +24,7 @@ class _EditSublimacionScreenState extends State<EditSublimacionScreen> {
   late TextEditingController _responsableController;
   late TextEditingController _reciboController;
   late TextEditingController _ubicacionController;
+  late TextEditingController _stockMinimoController;
 
   @override
   void initState() {
@@ -40,6 +41,9 @@ class _EditSublimacionScreenState extends State<EditSublimacionScreen> {
     _responsableController = TextEditingController(text: data['responsable']?.toString() ?? '');
     _reciboController = TextEditingController(text: data['recibo']?.toString() ?? '');
     _ubicacionController = TextEditingController(text: data['ubicacion']?.toString() ?? '');
+    _stockMinimoController = TextEditingController(
+    text: data['stock_minimo']?.toString() ?? '' // Maneja null correctamente
+);
   }
 
   Future<void> _guardarCambios() async {
@@ -60,6 +64,9 @@ class _EditSublimacionScreenState extends State<EditSublimacionScreen> {
           'responsable': _responsableController.text,
           'recibo': _reciboController.text,
           'ubicacion': _ubicacionController.text,
+          'stock_minimo': _stockMinimoController.text.isNotEmpty 
+    ? int.tryParse(_stockMinimoController.text) ?? 0 
+    : 0, // Guardar 0 si está vacío
         });
         Navigator.pop(context);
       } catch (e) {
@@ -69,6 +76,61 @@ class _EditSublimacionScreenState extends State<EditSublimacionScreen> {
       }
     }
   }
+
+  Widget _buildCompactEditableField(
+    String label, TextEditingController controller, IconData icon) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            prefixIcon: Icon(icon, color: Colors.grey, size: 24),
+            border: const OutlineInputBorder(),
+            contentPadding: const EdgeInsets.symmetric(vertical: 17, horizontal: 16),
+            isDense: true,
+            // Mostrar placeholder cuando está vacío
+            hintText: controller.text.isEmpty ? "No definido" : null,
+            hintStyle: const TextStyle(color: Colors.grey),
+          ),
+          style: const TextStyle(fontSize: 14),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value!.isNotEmpty && int.tryParse(value) == null) { // Permitir vacío
+              return 'Debe ser un número';
+            }
+            return null;
+          },
+        ),
+      ),
+      if (label == 'Stock Mínimo')
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: controller.text.isEmpty 
+              ? const Text(
+                  'Este producto no cuenta con stock mínimo',
+                  style: TextStyle(
+                    color: Colors.orange,
+                    fontSize: 12,
+                    fontFamily: 'Poppins',
+                  ),
+                )
+              : const Text(
+                  'Nota: Stock bajo generará notificación automática',
+                  style: TextStyle(
+                    color: Colors.orange,
+                    fontSize: 12,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+        ),
+    ],
+  );
+}
 
  @override
   Widget build(BuildContext context) {
@@ -86,6 +148,22 @@ class _EditSublimacionScreenState extends State<EditSublimacionScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                      Padding(
+                    padding: const EdgeInsets.only(bottom: 20, top: 10),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Editar artículo',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
                     // Fila 1: Artículo y Marca
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,10 +203,32 @@ class _EditSublimacionScreenState extends State<EditSublimacionScreen> {
                         Expanded(child: _buildEditField("Responsable", _responsableController, Remix.user_line)),
                         const SizedBox(width: 20),
                         Expanded(child: _buildEditField("Recibo", _reciboController, Remix.check_line)),
-                        const SizedBox(width: 20),
-                        Expanded(child: _buildEditField("Ubicación", _ubicacionController, Remix.mark_pen_line)),
                       ],
                     ),
+                    Row(
+  crossAxisAlignment: CrossAxisAlignment.start, // Alinear elementos en la parte superior
+  children: [
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start, // Alinear contenido en la parte superior
+        children: [
+          _buildEditField("Ubicación", _ubicacionController, Remix.mark_pen_line),
+        ],
+      ),
+    ),
+    const SizedBox(width: 20),
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start, // Alinear contenido en la parte superior
+        children: [
+          _buildCompactEditableField("Stock Mínimo", _stockMinimoController, Remix.box_1_line),
+        ],
+      ),
+    ),
+  ],
+),
                     const SizedBox(height: 20),
                     // Botones de acción
                     Row(
@@ -202,6 +302,7 @@ class _EditSublimacionScreenState extends State<EditSublimacionScreen> {
     _responsableController.dispose();
     _reciboController.dispose();
     _ubicacionController.dispose();
+    _stockMinimoController.dispose();
     super.dispose();
   }
 }

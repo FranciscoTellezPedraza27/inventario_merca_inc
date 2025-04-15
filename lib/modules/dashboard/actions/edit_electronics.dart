@@ -86,6 +86,22 @@ class _EditElectronicsScreenState extends State<EditElectronicsScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                      Padding(
+                    padding: const EdgeInsets.only(bottom: 20, top: 10),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Editar artículo',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
                     // Fila 1: Artículo y Marca
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,

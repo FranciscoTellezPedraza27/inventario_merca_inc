@@ -28,7 +28,7 @@ const handleStockNotification = async (change, context) => {
         await db.collection("notificaciones").add({
           titulo: `⚠️ Stock bajo en ${categoria.toUpperCase()}`,
           mensaje: `El producto "${afterData.articulo || 'Sin nombre'}" tiene stock bajo (${afterData.cantidad} unidades).`,
-          detalle_extra: `Stock mínimo: ${afterData.stock_minimo}`, // <-- Nueva línea
+          detalle_extra: `Stock mínimo: ${afterData.stock_minimo}`,
           fecha: FieldValue.serverTimestamp(),
           leida: false,
           documentoId: context.params.productId,

@@ -29,7 +29,7 @@ class ViewElectronicsScreen extends StatelessWidget {
             Expanded(
               flex: 4,
               child: Container(
-                height: 300,
+                height: 400,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   color: Colors.grey[100],
@@ -63,6 +63,19 @@ class ViewElectronicsScreen extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: Text(
+                            'Vista detallada del producto',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
                     _buildDetailRow("Cantidad", data['cantidad'], "Artículo", data['articulo']),
                     _buildDetailRow("Marca", data['marca'], "Modelo", data['modelo']),
                     _buildDetailRow("Especificaciones", data['especificaciones'], "N° Producto", data['numero_prodcuto']),
