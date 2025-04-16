@@ -380,7 +380,7 @@ Future<void> _crearNotificacionStockBajo({
 }) async {
   try {
     await FirebaseFirestore.instance.collection('notificaciones').add({
-      'titulo': '⚠️ Stock bajo en OXXO Adultos',
+      'titulo': '⚠️ Stock bajo en Papelería',
       'mensaje': 'El producto "$nombreProducto" tiene stock bajo ($stockActual unidades).',
       'detalle_extra': 'Stock mínimo: $stockMinimo', // <-- Corrección aquí
       'documentoId': productoId,

@@ -140,7 +140,7 @@ class _AddProduccionScreenState extends State<AddProduccionScreen> {
   await FirebaseFirestore.instance.collection('historial').add({
     'timestamp': FieldValue.serverTimestamp(),
     'usuario': FirebaseAuth.instance.currentUser?.email ?? 'Sistema', // Reemplaza con tu sistema de autenticación
-    'categoria': 'Produccion',
+    'categoria': 'Producción',
     'campo': 'Nuevo producto',
     'tipo_movimiento': accion,
     'valor_anterior': 'NO EXISTÍA',

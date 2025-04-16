@@ -15,7 +15,7 @@ class PdfService {
     final image = pw.MemoryImage(backgroundImage);
     final fechaGeneracion = DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now());
     
-   const int maxRowsPerPage = 13; // 14 en total contando encabezado
+   const int maxRowsPerPage = 8; // 14 en total contando encabezado
     int totalPages = (data.length / maxRowsPerPage).ceil();
 
     for (int i = 0; i < totalPages; i++) {
@@ -28,16 +28,16 @@ class PdfService {
       pdf.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4.landscape,
-          margin: const pw.EdgeInsets.all(20),
+          margin: const pw.EdgeInsets.all(0),
           build: (pw.Context context) {
             return pw.Stack(
               children: [
                 pw.Opacity(
                   opacity: 1,
-                  child: pw.Image(image, fit: pw.BoxFit.cover),
+                  child: pw.Image(image, fit: pw.BoxFit.fill),
                 ),
                 pw.Padding(
-                  padding: const pw.EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                  padding: const pw.EdgeInsets.symmetric(horizontal: 20, vertical: 80),
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [

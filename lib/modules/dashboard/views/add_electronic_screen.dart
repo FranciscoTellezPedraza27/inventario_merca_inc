@@ -140,7 +140,7 @@ class _AddElectronicScreenState extends State<AddElectronicScreen> {
   await FirebaseFirestore.instance.collection('historial').add({
     'timestamp': FieldValue.serverTimestamp(),
     'usuario': FirebaseAuth.instance.currentUser?.email ?? 'Sistema', // Reemplaza con tu sistema de autenticación
-    'categoria': 'Electronicos',
+    'categoria': 'Electrónicos',
     'campo': 'Nuevo producto',
     'tipo_movimiento': accion,
     'valor_anterior': 'NO EXISTÍA',

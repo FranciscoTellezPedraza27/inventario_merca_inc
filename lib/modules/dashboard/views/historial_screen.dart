@@ -29,110 +29,124 @@ class _HistorialScreenState extends State<HistorialScreen> {
     _cargarCategorias();
   }
 
-  void _cargarCategorias() async {
+void _cargarCategorias() async {
   final snapshot = await FirebaseFirestore.instance
       .collection('historial')
       .get();
 
-  // Paso 1: Extraer y normalizar
+  // Paso 1: Extraer categorías únicas y normalizar para filtrado
   final rawCategories = snapshot.docs
       .map((doc) => doc['categoria'] as String?)
       .where((c) => c != null && c.trim().isNotEmpty)
       .toList();
 
-  // Paso 2: Normalización avanzada
-  final normalizedCategories = rawCategories.map((c) {
-    return c!
-        .trim()
+  // Paso 2: Normalizar para filtrado (sin espacios, tildes, etc.)
+  final normalizedCategories = rawCategories.map((c) => c!
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[áàäâ]'), 'a')
+      .replaceAll(RegExp(r'[éèëê]'), 'e')
+      .replaceAll(RegExp(r'[íìïî]'), 'i')
+      .replaceAll(RegExp(r'[óòöô]'), 'o')
+      .replaceAll(RegExp(r'[úùüû]'), 'u')
+      .replaceAll(RegExp(r'[^a-z0-9]'), '')
+  ).toList();
+
+  // Paso 3: Formatear para visualización (Dropdown)
+  final Map<String, String> formatRules = {
+    'oxxokids': 'OXXO Kids',
+    'sublimacion': 'Sublimación',
+    'papeleria': 'Papelería',
+    'oxxoadultos': 'OXXO Adultos', // Agrega más reglas si necesitas
+  };
+
+  final formattedCategories = rawCategories.map((original) {
+    final normalized = original!
         .toLowerCase()
-        .replaceAll(RegExp(r'[áàäâ]'), 'a') // Elimina tildes y variantes
-        .replaceAll(RegExp(r'[éèëê]'), 'e')
-        .replaceAll(RegExp(r'[íìïî]'), 'i')
-        .replaceAll(RegExp(r'[óòöô]'), 'o')
-        .replaceAll(RegExp(r'[úùüû]'), 'u')
-        .replaceAll(RegExp(r'[^a-z0-9]'), ''); // Elimina caracteres especiales
+        .replaceAll(RegExp(r'[^a-z0-9]'), '');
+    
+    return formatRules[normalized] ?? 
+      original[0].toUpperCase() + original.substring(1).toLowerCase();
   }).toList();
 
-  // Paso 3: Eliminar duplicados manteniendo el primer formato original
-  final uniqueCategories = <String, String>{};
-  for (int i = 0; i < rawCategories.length; i++) {
-    final original = rawCategories[i]!;
-    final normalized = normalizedCategories[i];
-    if (!uniqueCategories.containsKey(normalized)) {
-      uniqueCategories[normalized] = original;
-    }
-  }
-
   setState(() {
-    _categorias = ['Todas', ...uniqueCategories.values.toList()];
+    _categorias = ['Todas', ...formattedCategories.toSet().toList()]; // Elimina duplicados
   });
 }
+Future<void> _generarPDF() async {
+  final pdfConfig = ReportConfig(
+    title: "Reporte de Historial",
+    collection: "historial",
+    headers: [
+      "Fecha",
+      "Hora",
+      "Usuario",
+      "Categoría",
+      "Tipo Mov.",
+      "Campo",
+      "Valor Anterior",
+      "Valor Nuevo"
+    ],
+    fields: [
+      "fecha",
+      "hora",
+      "usuario",
+      "categoria",
+      "tipo_movimiento",
+      "campo",
+      "valor_anterior",
+      "valor_nuevo"
+    ],
+  );
 
-  Future<void> _generarPDF() async {
-    final pdfConfig = ReportConfig(
-      title: "Reporte de Historial",
-      collection: "historial",
-      headers: [
-        "Fecha",
-        "Hora",
-        "Usuario",
-        "Categoría",
-        "Tipo Mov.",
-        "Campo",
-        "Valor Anterior",
-        "Valor Nuevo"
-      ],
-      fields: [
-        "fecha",
-        "hora",
-        "usuario",
-        "categoria",
-        "tipo_movimiento",
-        "campo",
-        "valor_anterior",
-        "valor_nuevo"
-      ],
+  try {
+    final ByteData imageData =
+        await rootBundle.load('lib/images/Hoja_Membretada.jpg');
+    final Uint8List backgroundImage = imageData.buffer.asUint8List();
+
+    // 🔥 Traer todos los datos de Firestore
+    final snapshot = await FirebaseFirestore.instance
+        .collection('historial')
+        .orderBy('timestamp', descending: true)
+        .get();
+
+    // 🔎 Aplicar el mismo filtrado que en pantalla
+    final documentosFiltrados = _aplicarFiltroBusqueda(snapshot.docs);
+
+    final dateFormat = DateFormat('dd/MM/yyyy');
+    final timeFormat = DateFormat('HH:mm:ss');
+
+    final data = documentosFiltrados.map((doc) {
+      final raw = doc.data() as Map<String, dynamic>;
+      final timestamp = raw['timestamp'] as Timestamp;
+
+      return {
+        'fecha': dateFormat.format(timestamp.toDate()),
+        'hora': timeFormat.format(timestamp.toDate()),
+        'usuario': raw['usuario'] ?? 'Sistema',
+        'categoria': raw['categoria'] ?? 'N/A',
+        'tipo_movimiento': raw['tipo_movimiento'] ?? 'N/A',
+        'campo': raw['campo'] ?? 'N/A',
+        'valor_anterior': raw['valor_anterior']?.toString() ?? '-',
+        'valor_nuevo': raw['valor_nuevo']?.toString() ?? '-',
+      };
+    }).toList();
+
+    final pdfBytes = await PdfService.generatePDF(
+      config: pdfConfig,
+      data: data,
+      backgroundImage: backgroundImage,
     );
 
-    try {
-      final ByteData imageData =
-          await rootBundle.load('lib/images/Hoja_Membretada.jpg');
-      final Uint8List backgroundImage = imageData.buffer.asUint8List();
+    await Printing.layoutPdf(onLayout: (_) => pdfBytes);
 
-      final querySnapshot = await _getFilteredStream().first;
-
-      final dateFormat = DateFormat('dd/MM/yyyy');
-      final timeFormat = DateFormat('HH:mm:ss');
-
-      final data = querySnapshot.docs.map((doc) {
-        final raw = doc.data() as Map<String, dynamic>;
-        final timestamp = raw['timestamp'] as Timestamp;
-
-        return {
-          'fecha': dateFormat.format(timestamp.toDate()),
-          'hora': timeFormat.format(timestamp.toDate()),
-          'usuario': raw['usuario'] ?? 'Sistema',
-          'categoria': raw['categoria'] ?? 'N/A',
-          'tipo_movimiento': raw['tipo_movimiento'] ?? 'N/A',
-          'campo': raw['campo'] ?? 'N/A',
-          'valor_anterior': raw['valor_anterior']?.toString() ?? '-',
-          'valor_nuevo': raw['valor_nuevo']?.toString() ?? '-',
-        };
-      }).toList();
-
-      final pdfBytes = await PdfService.generatePDF(
-        config: pdfConfig,
-        data: data,
-        backgroundImage: backgroundImage,
-      );
-
-      await Printing.layoutPdf(onLayout: (_) => pdfBytes);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al generar PDF: ${e.toString()}')),
-      );
-    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error al generar PDF: ${e.toString()}')),
+    );
   }
+}
+
 
   Stream<QuerySnapshot> _getFilteredStream() {
   return FirebaseFirestore.instance
